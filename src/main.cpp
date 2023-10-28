@@ -2,6 +2,8 @@
 // main.cpp:
 //  binlyzer, a program for reading an executable's header info.
 //
+//  https://github.com/0xAbby/binlyzer
+//
 // Author:
 //  Abdullah Ada 
 //
