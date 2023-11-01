@@ -2,6 +2,8 @@
 //    definitions for class / functions used to interact with the file,
 //    reading and writing operations.
 //
+//  https://github.com/0xAbby/binlyzer
+//
 // Author:
 //  Abdullah Ada 
 // 
