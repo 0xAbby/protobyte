@@ -2,23 +2,29 @@
 #include <gtest/gtest.h>
 #include "../src/headers.h"
 
-TEST(Test1, DosHeader) {
-    // prepare test case: parsing known file
-    PE pe("pe/samples/dbghelp.dll");
+class PETest : public testing::Test {
+public:
+    PE pe;
+    PETest() {
+        pe.init("./pe/samples/dbghelp.dll");
+    }
+    ~PETest() {
+    }
+};
 
-    ASSERT_EQ(pe.getDosMagic(), 0x4d5a);
-    
+TEST_F(PETest, DosHeader) {
+    ASSERT_EQ(pe.getDosMagic(), 0x5a4d);
 }
 
+TEST_F(PETest, e_lfanew) {
+    ASSERT_EQ(pe.getElfanew(), 0x00000110);
+}
 
-TEST(Test2, e_lfanew) {
-    PE pe("pe/samples/dbghelp.dll");
-    ASSERT_TRUE(pe.getElfanew() == 0x00000110);
+TEST_F(PETest, PE_Signature) {
+    ASSERT_EQ(pe.getPESignature(), 0x4550);
 }
 
 int main(int argc, char*argv[]) {
-
     testing::InitGoogleTest(&argc, argv);
-
     return RUN_ALL_TESTS();
 }

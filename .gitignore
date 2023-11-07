@@ -1,4 +1,5 @@
 unit_test/runTests
 binlyzer
-./build/*
+build/file_io.o
+build/pe.o
 .vscode

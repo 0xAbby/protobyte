@@ -43,6 +43,32 @@
 #define IMAGE_SUBSYSTEM_XBOX     			  14              //  XBOX
 #define IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION    16  //  Windows boot application. 
 
+uint8_t read8_le(std::ifstream &in);
+uint16_t read16_le(std::ifstream &in);
+uint32_t read32_le(std::ifstream &in);
+uint64_t read64_le(std::ifstream &in);
+
+
+class DataDir {
+  private:
+    // Data Directory
+    uint64_t    offset;
+    uint32_t    virtualAddr;
+    uint32_t    size;
+
+  public:
+    DataDir() {}
+    ~DataDir() { }
+
+    void setOffset(uint32_t offset) { this->offset = offset; }
+    void setVA(uint32_t va) { this->virtualAddr = va; }
+    void setSize(uint32_t sz) { this->size = sz;   }
+
+    uint64_t getOffset() { return this->offset; }
+    uint32_t getVA()  { return this->virtualAddr; }
+    uint64_t getSize() { return this->size; }      
+};
+
 class PE {
   private:
     // DOS header
@@ -110,7 +136,6 @@ class PE {
     uint32_t 	  loaderFlags;
     uint32_t 	  numberOfRvaAndSizes;
 
-
     // section_table_t    *section_table;
     // data_directory_t   *dataDirectory;
     // export_directory_t  exportDir;
@@ -125,42 +150,41 @@ class PE {
 
 public:
 
-  void parse(FILE *in);
-  void readDOSHeader(FILE *in);
-  void readPE(FILE *in);
-  void readDatadir(FILE *in);
-  void readSections(FILE *in);
+  void parse(std::ifstream &in);
+  void readDOSHeader(std::ifstream &in);
+  void readPE(std::ifstream &in);
+  void readDatadir(std::ifstream &in, DataDir dataDir[]);
+  void readSections(std::ifstream &in);
+
+  uint16_t getDosMagic() {
+    return this->dosMagic;
+  }  
+
 
   uint16_t getSections() {
     return this->numberOfSections;
   }
 
+  uint32_t getElfanew() {
+    return this->e_lfanew;
+  }
+  uint32_t getPESignature() {
+    return this->peSignature;
+  }
+
   PE() { }
-  PE(FILE *in) {
+  PE(std::string filename) {
+    std::ifstream in(filename, std::ios::in | std::ios::binary);
+    parse(in);
+  }
+
+  void init(std::string filename){
+    std::ifstream in(filename, std::ios::in | std::ios::binary);
     parse(in);
   }
   ~PE();
 
-};
 
-class DataDir {
-  private:
-    // Data Directory
-    uint64_t    offset;
-    uint32_t    virtualAddr;
-    uint32_t    size;
-
-  public:
-    DataDir() {}
-    ~DataDir() { }
-
-    void setOffset(uint32_t offset) { this->offset = offset; }
-    void setVA(uint32_t va) { this->virtualAddr = va; }
-    void setSize(uint32_t sz) { this->size = sz;   }
-
-    uint64_t getOffset() { return this->offset; }
-    uint32_t getVA()  { return this->virtualAddr; }
-    uint64_t getSize() { return this->size; }      
 };
 
 class Section {
@@ -248,50 +272,6 @@ typedef struct export_directory_t {
 // void      print_section_characteristics(uint32_t ch);
 // void      print_exports(dos_header_t *dosHeader);
 // void      print_imports(dos_header_t *dosHeader);
-
-// // functions to parse section from PE file
-// void      read_dos(FILE *in, dos_header_t *dosHeader);
-// void      read_pe(FILE *in, dos_header_t *dosHeader);
-// void      read_dataDir(FILE *in, dos_header_t *dosHeader);
-// void      read_sections(FILE *in, dos_header_t *dosHeader);
-// void      read_dataOffset(dos_header_t *dosHeader);
-// void      read_exportDir(FILE *in, dos_header_t *dosHeader);
-// void      read_exportNames(FILE *in, dos_header_t *dosHeader);
-// void      read_importDir(FILE *in, dos_header_t *dosHeader);
-
-// // cleanup function
-// void      cleanup(dos_header_t *dosHeader);
-
-
-// functions to read little endian data (strings and integers)
-char     *read_str(FILE *in, int count);
-uint8_t   read8_le(FILE *in);
-uint16_t  read16_le(FILE *in);
-uint32_t  read32_le(FILE *in);
-uint64_t  read64_le(FILE *in);
-
-
-// // functions that perform high level tasks
-// //void load_file(int argc, char *argv[]);
-// void print_headers(dos_header_t *dosHeader);
-// void print_dataTables(dos_header_t *dosHeader);
-// void print_sections(dos_header_t *dosHeader);
-
-
-// functions to read little endian data (strings and integers)
-char     *read_str(FILE *in, int count);
-uint8_t   read8_le(FILE *in);
-uint16_t  read16_le(FILE *in);
-uint32_t  read32_le(FILE *in);
-uint64_t  read64_le(FILE *in);
-
-
-// // functions that perform high level tasks
-// void load_file(int argc, char *argv[]);
-// void print_headers(dos_header_t *dosHeader);
-// void print_dataTables(dos_header_t *dosHeader);
-// void print_sections(dos_header_t *dosHeader);
-
 
 
 #endif

@@ -9,26 +9,26 @@
 //
 #include "pe.h"
 
-void PE::parse(FILE* in) {
+void PE::parse(std::ifstream &in) {
   // parsing process in steps
   readDOSHeader(in);
   readPE(in);
-  if (peSignature != 0x4550) {
-    printf("invalid PE signature.\n");
-    return;
-  }
+  DataDir dataDir[numberOfRvaAndSizes];
+  readDatadir(in, dataDir);
+ // readSections(in);
+}
+PE::~PE() {
 
-  readDatadir(in);
-  readSections(in);
 }
 
-void PE::readDOSHeader(FILE* in) {
+void PE::readDOSHeader(std::ifstream &in) {
+  
   // Reading DOS Header
   dosMagic = read16_le(in);
   e_cblp = read16_le(in);
   e_cp = read16_le(in);
   e_crlc = read16_le(in);
-  e_cparhdr = read16_le(in);
+   e_cparhdr = read16_le(in);
   e_minalloc = read16_le(in);
   e_maxalloc = read16_le(in);
   e_ss = read16_le(in);
@@ -47,11 +47,59 @@ void PE::readDOSHeader(FILE* in) {
   e_lfanew = read32_le(in);
 }
 
-void PE::readPE(FILE* in) {
-  if (fseek(in, e_lfanew, SEEK_SET) == -1) {
-    printf("Error during file reading.\n");
-    exit(-1);
-  }
+uint8_t read8_le(std::ifstream &in) {
+  uint8_t value = 0;
+  char ch[1] = {0};
+
+  in.read(ch, 1);
+  value = ch[0];
+  
+  return value;
+}
+
+uint16_t read16_le(std::ifstream &in) {
+  uint16_t value = 0;
+  char ch[3] = {0};
+
+  in.read(ch, 2);
+  value = ch[0];
+  value |= ch[1] << 8;
+  
+  return value;
+}
+
+uint32_t read32_le(std::ifstream &in) {
+  uint32_t value = 0;
+  char ch[5] = {0};
+
+  in.read(ch, 4);
+  value = ch[0];
+  value |= ch[1] << 8;
+  value |= ch[2] << 16;
+  value |= ch[3] << 24;
+  
+  return value;
+}
+
+uint64_t read64_le(std::ifstream &in) {
+  uint64_t value = 0;
+  char ch[9] = {0};
+
+  in.read(ch, 8);
+  value = ch[0];
+  value |= ch[1] << 8;
+  value |= ch[2] << 16;
+  value |= ch[3] << 24;
+  value |= ch[4] << 32;
+  value |= ch[5] << 40;
+  value |= ch[6] << 48;
+  value |= ch[7] << 54;
+  
+  return value;
+}
+
+void PE::readPE(std::ifstream &in) {
+  in.seekg(e_lfanew, std::ios_base::beg);
 
   // PE header
   peSignature = read32_le(in);
@@ -74,10 +122,10 @@ void PE::readPE(FILE* in) {
   baseOfCode = read32_le(in);
 
   if (optHeaderMagic == OPTIONAL_IMAGE_PE32_plus) {
-    imageBase = read64_le(in);
+    imageBase = read64_le(in); 
   } else {
     baseOfData = read32_le(in);
-    imageBase = read32_le(in);
+    imageBase = read32_le(in); 
   }
   sectionAlignment = read32_le(in);
   fileAlignment = read32_le(in);
@@ -109,32 +157,57 @@ void PE::readPE(FILE* in) {
   numberOfRvaAndSizes = read32_le(in);
 }
 
-void PE::readDatadir(FILE* in) {
-  DataDir dataDir[numberOfRvaAndSizes];
+// uint64_t rva_to_offset(int numberOfSections, uint64_t rva, 
+//                            section_table_t *sections) {
+//   if(rva == 0) return 0;
+//   uint64_t sumAddr;
 
+//   for(int idx = 0; idx < numberOfSections; idx++) 
+//   {
+//     sumAddr = sections[idx].virtualAddr + sections[idx].sizeOfRawData;
+//     if(rva >= sections[idx].virtualAddr && (rva <= sumAddr)) {
+//       return  sections[idx].ptrToRawData + (rva - sections[idx].virtualAddr);
+//     }
+//   }
+//   return -1;
+// }
+
+void PE::readDatadir(std::ifstream &in, DataDir dataDir[]) {
   // Reading Data Directories
-  for (int idx = 0; idx < numberOfRvaAndSizes; idx++) {
+  for (uint32_t idx = 0; idx < numberOfRvaAndSizes; idx++) {
     dataDir[idx].setVA(read32_le(in));
     dataDir[idx].setSize(read32_le(in));
-    dataDir[idx].setOffset(0);  // need to calculate file offset from VA.
+    dataDir[idx].setOffset(0);  // setting file offset is 
+                                // possible after sections info is read.
   }
 }
 
-void PE::readSections(FILE* in) {
-  // Reading Sections data
+// void PE::readSections(std::fstream in) {
+//   // Reading Sections data
 
-  Section sec[numberOfSections];
+//   Section sec[numberOfSections];
 
-  for (int idx = 0; idx < numberOfSections; idx++) {
-    sec[idx].setName(read_str(in, 8));
-    sec[idx].setVSize(read32_le(in));
-    sec[idx].setVA(read32_le(in));
-    sec[idx].setRawDataSz(read32_le(in));
-    sec[idx].setRawDataPtr(read32_le(in));
-    sec[idx].setPtrReloc(read32_le(in));
-    sec[idx].setPtrLineNum(read32_le(in));
-    sec[idx].setRelocNum(read16_le(in));
-    sec[idx].setLineNum(read16_le(in));
-    sec[idx].setCharacter(read32_le(in));
-  }
-}
+//   for (int idx = 0; idx < numberOfSections; idx++) {
+//     sec[idx].setName(in.read(8));
+//     sec[idx].setVSize(in.read(); // 32 bits);
+//     sec[idx].setVA(in.read(); // 32 bits);
+//     sec[idx].setRawDataSz(in.read(); // 32 bits);
+//     sec[idx].setRawDataPtr(in.read(); // 32 bits);
+//     sec[idx].setPtrReloc(in.read(); // 32 bits);
+//     sec[idx].setPtrLineNum(in.read(); // 32 bits);
+//     sec[idx].setRelocNum(in.read(); // 16 bits);
+//     sec[idx].setLineNum(in.read(); // 16 bits);
+//     sec[idx].setCharacter(in.read(); // 32 bits);
+//   }
+// }
+
+
+
+// char *PE::read_str(std::ifstream &in, int count) {
+//   char *ch_ptr = (char*) malloc(sizeof(char)*count);
+//   for(int i = 0; i < count; i++) {
+//     ch_ptr[i] = fgetc(in);
+//   }
+//   ch_ptr[strlen(ch_ptr)] = 0;
+//   return ch_ptr;
+// }
