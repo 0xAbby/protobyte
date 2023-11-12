@@ -15,15 +15,13 @@
 
 class FileIO {
 private:
-  FILE *in;
+  
 
 public:
   FileIO(int argc, char *argv[]);
   ~FileIO();
-
-
-
-  uint8_t read8_le(FILE *in);
+  
+  uint16_t read16_le(std::ifstream &in);
 };
 
 
