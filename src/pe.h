@@ -136,6 +136,11 @@ class PE {
     uint32_t 	  loaderFlags;
     uint32_t 	  numberOfRvaAndSizes;
 
+    // mapping flag types and strings
+    std::map<uint32_t, std::string> mapSectionFlags;
+    std::map<uint16_t, std::string> mapPEFlagTypes;
+    std::map<uint16_t, std::string> mapImageCharacteristics;
+
     // section_table_t    *section_table;
     // data_directory_t   *dataDirectory;
     // export_directory_t  exportDir;
@@ -155,6 +160,7 @@ public:
   void readPE(std::ifstream &in);
   void readDatadir(std::ifstream &in, DataDir dataDir[]);
   void readSections(std::ifstream &in);
+  void mapHeaderFlags();
 
   uint16_t getDosMagic() {
     return this->dosMagic;

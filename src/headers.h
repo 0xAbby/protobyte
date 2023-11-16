@@ -12,6 +12,8 @@
  
 #include <iostream>
 #include <fstream>
+#include <map>
+#include <utility>
 #include <cstdio>
 #include <stdlib.h>
 #include <cstdint>
