@@ -6,7 +6,7 @@ class PETest : public testing::Test {
 public:
     PE pe;
     PETest() {
-        pe.init("./pe/samples/dbghelp.dll");
+        pe.init("./pe/dbghelp.dll");
     }
     ~PETest() {
     }
@@ -20,7 +20,7 @@ TEST_F(PETest, e_lfanew) {
     ASSERT_EQ(pe.getElfanew(), 0x00000110);
 }
 
-TEST_F(PETest, PE_Signature) {
+TEST_F(PETest, PESignature) {
     ASSERT_EQ(pe.getPESignature(), 0x4550);
 }
 
