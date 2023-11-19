@@ -12,36 +12,9 @@
 #include "headers.h"
 #include "file_io.h"
 
-// Machine types
-// https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#machine-types
-#define IMAGE_FILE_MACHINE_UNKNOWN  0x0     // assumed to be applicable to any machine type
-#define IMAGE_FILE_MACHINE_IA64   	0x200   // Intel Itanium processor family
-#define IMAGE_FILE_MACHINE_I386   	0x14c   // Intel 386 or later processors and compatible processors
-#define IMAGE_FILE_MACHINE_AMD64   	0x8664  // x64
-#define IMAGE_FILE_MACHINE_ARM   		0x1c0   // ARM little endian
-#define IMAGE_FILE_MACHINE_ARM64   	0xaa64  // ARM64 little endian
-#define IMAGE_FILE_MACHINE_ARMNT   	0x1c4   // ARM Thumb-2 little endian
-#define IMAGE_FILE_MACHINE_EBC   		0xebc   // EFI byte code
-
-// PE optional image
+// PE image type
 #define OPTIONAL_IMAGE_PE32      0x10b
 #define OPTIONAL_IMAGE_PE32_plus 0x20b
-
-// Image subsystem
-#define IMAGE_SUBSYSTEM_UNKNOWN   		  	0   		//  An unknown subsystem
-#define IMAGE_SUBSYSTEM_NATIVE    		  	1   		//  Device drivers and native Windows processes
-#define IMAGE_SUBSYSTEM_WINDOWS_GUI     	2  		 	//  The Windows graphical user interface (GUI) subsystem
-#define IMAGE_SUBSYSTEM_WINDOWS_CUI     	3  		 	//  The Windows character subsystem
-#define IMAGE_SUBSYSTEM_OS2_CUI     	  	5    		//  The OS/2 character subsystem
-#define IMAGE_SUBSYSTEM_POSIX_CUI     		7    		//	The Posix character subsystem
-#define IMAGE_SUBSYSTEM_NATIVE_WINDOWS    8  	    //  Native Win9x driver
-#define IMAGE_SUBSYSTEM_WINDOWS_CE_GUI   	9   		//  Windows CE
-#define IMAGE_SUBSYSTEM_EFI_APPLICATION   10   		//  An Extensible Firmware Interface (EFI) application
-#define IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER    11   //  An EFI driver with boot services
-#define IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER     	   12   // 	An EFI driver with run-time services
-#define IMAGE_SUBSYSTEM_EFI_ROM     		13      	    	//	An EFI ROM image
-#define IMAGE_SUBSYSTEM_XBOX     			  14              //  XBOX
-#define IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION    16  //  Windows boot application. 
 
 uint8_t read8_le(std::ifstream &in);
 uint16_t read16_le(std::ifstream &in);
@@ -69,77 +42,112 @@ class DataDir {
     uint64_t getSize() { return this->size; }      
 };
 
+class Section {
+  private:
+    // section table
+    char        name[7];
+    uint32_t    virtualSize;
+    uint32_t    virtualAddr;
+    uint32_t    sizeOfRawData;
+    uint32_t    ptrToRawData;
+    uint32_t    ptrToReloc;
+    uint32_t    ptrToLineNum;
+    uint32_t    numberOfReloc;
+    uint32_t    numberOfLineNum;
+    uint32_t    characteristics;
+  public:
+
+    Section() { }
+    ~Section() { }
+
+    void setName(std::ifstream &in) { 
+      in.get(this->name, 8); 
+    }
+    void setVSize(uint32_t vsz) { this->virtualSize = vsz; }
+    void setVA(uint32_t va) { this->virtualAddr = va; }
+    void setRawDataSz(uint32_t sz) { this-> sizeOfRawData = sz; }
+    void setRawDataPtr(uint32_t ptr) { this->ptrToRawData = ptr; }
+    void setPtrReloc(uint32_t ptr) { this->ptrToReloc = ptr; }
+    void setPtrLineNum(uint32_t ptr ) { this->ptrToLineNum = ptr; } 
+    void setRelocNum(uint32_t n) { this->numberOfReloc = n; }
+    void setLineNum(uint32_t n) { this->numberOfLineNum = n; }
+    void setCharacter(uint32_t ch) { this->characteristics = ch ;}
+
+};
+
 class PE {
   private:
     // DOS header
-    uint16_t  dosMagic;      // Magic DOS signature MZ
-    uint16_t  e_cblp;		  // Bytes on last page of file
-    uint16_t  e_cp;		    // Pages in file
-    uint16_t  e_crlc;		  // Relocations
-    uint16_t	e_cparhdr;	// Size of header in paragraphs
-    uint16_t	e_minalloc;	// Minimum extra paragraphs needed
-    uint16_t	e_maxalloc;	// Maximum extra paragraphs needed
-    uint16_t	e_ss;		    // nitial (relative) SS value
-    uint16_t	e_sp;		    // Initial SP value
-    uint16_t	e_csum;		  // Checksum
-    uint16_t	e_ip;		    // Initial IP value
-    uint16_t	e_cs;		    // Initial (relative) CS value
-    uint16_t	e_lfarlc;	  // File address of relocation table
-    uint16_t	e_ovno;		  // Overloay number
-    uint64_t	e_res;	    // Reserved uint16_ts (4 uint16_ts)
-    uint16_t	e_oemid;		// OEM identifier (for e_oeminfo)
-    uint16_t	e_oeminfo;	// OEM information; e_oemid specific
-    uint64_t	e_res2;	    // Reserved uint16_ts (10 uint16_ts)
-    uint32_t  e_lfanew;   // Offset to start of PE header
+    uint16_t   dosMagic_u16;      // Magic DOS signature MZ
+    uint16_t   e_cblp_u16;		  // Bytes on last page of file
+    uint16_t   e_cp_u16;		    // Pages in file
+    uint16_t   e_crlc_u16;		  // Relocations
+    uint16_t   e_cparhdr_u16;	// Size of header in paragraphs
+    uint16_t   e_minalloc_u16;	// Minimum extra paragraphs needed
+    uint16_t   e_maxalloc_u16;	// Maximum extra paragraphs needed
+    uint16_t   e_ss_u16;		    // nitial (relative) SS value
+    uint16_t   e_sp_u16;		    // Initial SP value
+    uint16_t   e_csum_u16;		  // Checksum
+    uint16_t   e_ip_u16;		    // Initial IP value
+    uint16_t   e_cs_u16;		    // Initial (relative) CS value
+    uint16_t   e_lfarlc_u16;	  // File address of relocation table
+    uint16_t   e_ovno_u16;		  // Overloay number
+    uint64_t	 e_res_u64;	    // Reserved uint16_ts (4 uint16_ts)
+    uint16_t   e_oemid_u16;		// OEM identifier (for e_oeminfo)
+    uint16_t   e_oeminfo_u16;	// OEM information; e_oemid specific
+    uint64_t	 e_res2_u64;	    // Reserved uint16_ts (10 uint16_ts)
+    uint32_t   e_lfanew_u32;   // Offset to start of PE header
 
     // PE header
-    uint32_t  peOffset;
-    uint32_t  peSignature;
-    uint16_t  machine;
-    uint16_t  numberOfSections;
-    uint32_t  timeStamp;
-    uint32_t  symTablePtr;
-    uint32_t  numberOfSym;
-    uint16_t  optionalHeaderSize;
-    uint16_t  characteristics;
+    uint32_t  peOffset_u32;
+    uint32_t  peSignature_u32;
+    uint16_t  machine_u16;
+    uint16_t  numberOfSections_u16;
+    uint32_t  timeStamp_u32;
+    uint32_t  symTablePtr_u32;
+    uint32_t  numberOfSym_u32;
+    uint16_t  optionalHeaderSize_u16;
+    uint16_t  characteristics_u16;
 
 
     // Optional Header Image
-    uint16_t    optHeaderMagic;
-    uint8_t     majorLinkerVer;
-    uint8_t     minorLinkerVer;
-    uint32_t    sizeOfCode;
-    uint32_t    sizeOfInitializedData;
-    uint32_t    sizeOfUninitializedData;
-    uint32_t    entryPoint;
-    uint32_t    baseOfCode;
-    uint32_t    baseOfData;
-    uint64_t    imageBase;
-    uint32_t    sectionAlignment;
-    uint32_t    fileAlignment;
-    uint16_t    majorOSVer;
-    uint16_t    minorOSVer;
-    uint16_t 	  majorImageVer;
-    uint16_t 	  minorImageVer;
-    uint16_t 	  majorSubsystemVer;
-    uint16_t 	  minorSubsystemVer;
-    uint32_t 	  win32VersionVal;
-    uint32_t 	  sizeOfImage;
-    uint32_t 	  sizeOfHeaders;
-    uint32_t 	  checkSum;
-    uint16_t 	  subsystem;
-    uint16_t 	  dllCharacteristics;
-    uint64_t 	  sizeOfStackReserve;
-    uint64_t 	  sizeOfStackCommit;
-    uint64_t 	  sizeOfHeapReserve;
-    uint64_t 	  sizeOfHeapCommit;
-    uint32_t 	  loaderFlags;
-    uint32_t 	  numberOfRvaAndSizes;
+    uint16_t    optionalHeaderMagic_u16;
+    uint8_t     majorLinkerVer_u8;
+    uint8_t     minorLinkerVer_u8;
+    uint32_t    sizeOfCode_u32;
+    uint32_t    sizeOfInitializedData_u32;
+    uint32_t    sizeOfUninitializedData_u32;
+    uint32_t    entryPoint_u32;
+    uint32_t    baseOfCode_u32;
+    uint32_t    baseOfData_u32;
+    uint64_t    imageBase_u64;
+    uint32_t    sectionAlignment_u32;
+    uint32_t    fileAlignment_u32;
+    uint16_t    majorOSVersion_u16;
+    uint16_t    minorOSVersion_u16;
+    uint16_t 	  majorImageVersion_u16;
+    uint16_t 	  minorImageVersion_u16;
+    uint16_t 	  majorSubsystemVersion_u16;
+    uint16_t 	  minorSubsystemVer_u16;
+    uint32_t 	  win32VersionVal_u32;
+    uint32_t 	  sizeOfImage_u32;
+    uint32_t 	  sizeOfHeaders_u32;
+    uint32_t 	  checkSum_u32;
+    uint16_t 	  subsystem_u16;
+    uint16_t 	  dllCharacteristics_u16;
+    uint64_t 	  sizeOfStackReserve_u64;
+    uint64_t 	  sizeOfStackCommit_u64;
+    uint64_t 	  sizeOfHeapReserve_u64;
+    uint64_t 	  sizeOfHeapCommit_u64;
+    uint32_t 	  loaderFlags_u32;
+    uint32_t 	  numberOfRvaAndSizes_u32;
 
     // mapping flag types and strings
     std::map<uint32_t, std::string> mapSectionFlags;
     std::map<uint16_t, std::string> mapPEFlagTypes;
     std::map<uint16_t, std::string> mapImageCharacteristics;
+    std::map<uint16_t, std::string> mapMachineType;
+    std::map<uint8_t, std::string> mapImageSubsystem;
 
     // section_table_t    *section_table;
     // data_directory_t   *dataDirectory;
@@ -159,23 +167,34 @@ public:
   void readDOSHeader(std::ifstream &in);
   void readPE(std::ifstream &in);
   void readDatadir(std::ifstream &in, DataDir dataDir[]);
-  void readSections(std::ifstream &in);
+  void readSections(std::ifstream &in, Section sections[]);
   void mapHeaderFlags();
 
   uint16_t getDosMagic() {
-    return this->dosMagic;
+    return this->dosMagic_u16;
   }  
 
 
   uint16_t getSections() {
-    return this->numberOfSections;
+    return this->numberOfSections_u16;
   }
 
   uint32_t getElfanew() {
-    return this->e_lfanew;
+    return this->e_lfanew_u32;
   }
   uint32_t getPESignature() {
-    return this->peSignature;
+    return this->peSignature_u32;
+  }
+  uint16_t getNumberOfSections() {
+    return this->numberOfSections_u16;
+  }
+
+  uint16_t getMachineType() {
+    return this->machine_u16;
+  }
+
+  uint16_t getDllCharacterics() {
+    return this->dllCharacteristics_u16;
   }
 
   PE() { }
@@ -190,37 +209,6 @@ public:
   }
   ~PE();
 
-
-};
-
-class Section {
-  private:
-    // section table
-    char       *name;
-    uint32_t    virtualSize;
-    uint32_t    virtualAddr;
-    uint32_t    sizeOfRawData;
-    uint32_t    ptrToRawData;
-    uint32_t    ptrToReloc;
-    uint32_t    ptrToLineNum;
-    uint32_t    numberOfReloc;
-    uint32_t    numberOfLineNum;
-    uint32_t    characteristics;
-  public:
-
-    Section() { }
-    ~Section() { }
-
-    void setName(char* n) { this->name = n; }
-    void setVSize(uint32_t vsz) { this->virtualSize = vsz; }
-    void setVA(uint32_t va) { this->virtualAddr = va; }
-    void setRawDataSz(uint32_t sz) { this-> sizeOfRawData = sz; }
-    void setRawDataPtr(uint32_t ptr) { this->ptrToRawData = ptr; }
-    void setPtrReloc(uint32_t ptr) { this->ptrToReloc = ptr; }
-    void setPtrLineNum(uint32_t ptr ) { this->ptrToLineNum = ptr; } 
-    void setRelocNum(uint32_t n) { this->numberOfReloc = n; }
-    void setLineNum(uint32_t n) { this->numberOfLineNum = n; }
-    void setCharacter(uint32_t ch) { this->characteristics = ch ;}
 
 };
 

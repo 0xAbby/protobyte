@@ -13,11 +13,19 @@ void PE::parse(std::ifstream &in) {
   // parsing process in steps
   readDOSHeader(in);
   readPE(in);
-  DataDir dataDir[numberOfRvaAndSizes];
+  DataDir dataDir[numberOfRvaAndSizes_u32];
   readDatadir(in, dataDir);
-  Section sections[numberOfSections];
- // readSections(in, sections);
+  Section sections[numberOfSections_u16];
+  readSections(in, sections);
 
+
+  // print PE info
+
+  // print magic bytes
+  // print PE offset
+  // print number of section
+  // print characteristics
+  // print sections information
   mapHeaderFlags();
 }
 PE::~PE() {
@@ -27,27 +35,27 @@ PE::~PE() {
 void PE::readDOSHeader(std::ifstream &in) {
   
   // Reading DOS Header
-  dosMagic = read16_le(in);
-  e_cblp = read16_le(in);
-  e_cp = read16_le(in);
-  e_crlc = read16_le(in);
-   e_cparhdr = read16_le(in);
-  e_minalloc = read16_le(in);
-  e_maxalloc = read16_le(in);
-  e_ss = read16_le(in);
-  e_sp = read16_le(in);
-  e_csum = read16_le(in);
-  e_ip = read16_le(in);
-  e_cs = read16_le(in);
-  e_lfarlc = read16_le(in);
-  e_ovno = read16_le(in);
-  e_res = read64_le(in);
-  e_oemid = read16_le(in);
-  e_oeminfo = read16_le(in);
-  e_res2 = read64_le(in);
-  e_res2 = read64_le(in);
-  e_res2 = read32_le(in);
-  e_lfanew = read32_le(in);
+  dosMagic_u16 = read16_le(in);
+  e_cblp_u16 = read16_le(in);
+  e_cp_u16 = read16_le(in);
+  e_crlc_u16 = read16_le(in);
+  e_cparhdr_u16 = read16_le(in);
+  e_minalloc_u16 = read16_le(in);
+  e_maxalloc_u16 = read16_le(in);
+  e_ss_u16 = read16_le(in);
+  e_sp_u16 = read16_le(in);
+  e_csum_u16 = read16_le(in);
+  e_ip_u16 = read16_le(in);
+  e_cs_u16 = read16_le(in);
+  e_lfarlc_u16 = read16_le(in);
+  e_ovno_u16 = read16_le(in);
+  e_res_u64 = read64_le(in);
+  e_oemid_u16 = read16_le(in);
+  e_oeminfo_u16 = read16_le(in);
+  e_res2_u64 = read64_le(in);
+  e_res2_u64 = read64_le(in);
+  e_res2_u64 = read32_le(in);
+  e_lfanew_u32 = read32_le(in);
 }
 
 uint8_t read8_le(std::ifstream &in) {
@@ -102,101 +110,101 @@ uint64_t read64_le(std::ifstream &in) {
 }
 
 void PE::readPE(std::ifstream &in) {
-  in.seekg(e_lfanew, std::ios_base::beg);
+  in.seekg(e_lfanew_u32, std::ios_base::beg);
 
   // PE header
-  peSignature = read32_le(in);
-  machine = read16_le(in);
-  numberOfSections = read16_le(in);
-  timeStamp = read32_le(in);
-  symTablePtr = read32_le(in);
-  numberOfSym = read32_le(in);
-  optionalHeaderSize = read16_le(in);
-  characteristics = read16_le(in);
+  peSignature_u32 = read32_le(in);
+  machine_u16 = read16_le(in);
+  numberOfSections_u16 = read16_le(in);
+  timeStamp_u32 = read32_le(in);
+  symTablePtr_u32 = read32_le(in);
+  numberOfSym_u32 = read32_le(in);
+  optionalHeaderSize_u16 = read16_le(in);
+  characteristics_u16 = read16_le(in);
 
   // optional header (Standard Fields)
-  optHeaderMagic = read16_le(in);
-  majorLinkerVer = read8_le(in);
-  minorLinkerVer = read8_le(in);
-  sizeOfCode = read32_le(in);
-  sizeOfInitializedData = read32_le(in);
-  sizeOfUninitializedData = read32_le(in);
-  entryPoint = read32_le(in);
-  baseOfCode = read32_le(in);
+  optionalHeaderMagic_u16 = read16_le(in);
+  majorLinkerVer_u8 = read8_le(in);
+  minorLinkerVer_u8 = read8_le(in);
+  sizeOfCode_u32 = read32_le(in);
+  sizeOfInitializedData_u32 = read32_le(in);
+  sizeOfUninitializedData_u32 = read32_le(in);
+  entryPoint_u32 = read32_le(in);
+  baseOfCode_u32 = read32_le(in);
 
-  if (optHeaderMagic == OPTIONAL_IMAGE_PE32_plus) {
-    imageBase = read64_le(in); 
+  if (optionalHeaderMagic_u16 == OPTIONAL_IMAGE_PE32_plus) {
+    imageBase_u64 = read64_le(in); 
   } else {
-    baseOfData = read32_le(in);
-    imageBase = read32_le(in); 
+    baseOfData_u32 = read32_le(in);
+    imageBase_u64 = read32_le(in); // possible bug?
   }
-  sectionAlignment = read32_le(in);
-  fileAlignment = read32_le(in);
-  majorOSVer = read16_le(in);
-  minorOSVer = read16_le(in);
-  majorImageVer = read16_le(in);
-  minorImageVer = read16_le(in);
-  majorSubsystemVer = read16_le(in);
-  minorSubsystemVer = read16_le(in);
-  win32VersionVal = read32_le(in);
-  sizeOfImage = read32_le(in);
-  sizeOfHeaders = read32_le(in);
-  checkSum = read32_le(in);
-  subsystem = read16_le(in);
-  dllCharacteristics = read16_le(in);
+  sectionAlignment_u32 = read32_le(in);
+  fileAlignment_u32 = read32_le(in);
+  majorOSVersion_u16 = read16_le(in);
+  minorOSVersion_u16 = read16_le(in);
+  majorImageVersion_u16 = read16_le(in);
+  minorImageVersion_u16 = read16_le(in);
+  majorSubsystemVersion_u16 = read16_le(in);
+  minorSubsystemVer_u16 = read16_le(in);
+  win32VersionVal_u32 = read32_le(in);
+  sizeOfImage_u32 = read32_le(in);
+  sizeOfHeaders_u32 = read32_le(in);
+  checkSum_u32 = read32_le(in);
+  subsystem_u16 = read16_le(in);
+  dllCharacteristics_u16 = read16_le(in);
 
-  if (optHeaderMagic == OPTIONAL_IMAGE_PE32_plus) {
-    sizeOfStackReserve = read64_le(in);
-    sizeOfStackCommit = read64_le(in);
-    sizeOfHeapReserve = read64_le(in);
-    sizeOfHeapCommit = read64_le(in);
+  if (optionalHeaderMagic_u16 == OPTIONAL_IMAGE_PE32_plus) {
+    sizeOfStackReserve_u64 = read64_le(in);
+    sizeOfStackCommit_u64 = read64_le(in);
+    sizeOfHeapReserve_u64 = read64_le(in);
+    sizeOfHeapCommit_u64 = read64_le(in);
   } else {
-    sizeOfStackReserve = read32_le(in);
-    sizeOfStackCommit = read32_le(in);
-    sizeOfHeapReserve = read32_le(in);
-    sizeOfHeapCommit = read32_le(in);
+    sizeOfStackReserve_u64 = read32_le(in);
+    sizeOfStackCommit_u64 = read32_le(in);
+    sizeOfHeapReserve_u64 = read32_le(in);
+    sizeOfHeapCommit_u64 = read32_le(in);
   }
-  loaderFlags = read32_le(in);
-  numberOfRvaAndSizes = read32_le(in);
+  loaderFlags_u32 = read32_le(in);
+  numberOfRvaAndSizes_u32 = read32_le(in);
 }
 
 void PE::mapHeaderFlags() {
   using namespace std;
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00000008, "IMAGE_SCN_TYPE_NO_PAD"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00000020, "IMAGE_SCN_CNT_CODE"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00000040, "IMAGE_SCN_CNT_INITIALIZED_DATA"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00000080, "IMAGE_SCN_CNT_UNINITIALIZED_ DATA"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00000100, "IMAGE_SCN_LNK_OTHER"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00000200, "IMAGE_SCN_LNK_INFO"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00000800, "IMAGE_SCN_LNK_REMOVE"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00001000, "IMAGE_SCN_LNK_COMDAT"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00008000, "IMAGE_SCN_GPREL"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00020000, "IMAGE_SCN_MEM_PURGEABLE"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00020000, "IMAGE_SCN_MEM_16BIT"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00040000, "IMAGE_SCN_MEM_LOCKED"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00080000, "IMAGE_SCN_MEM_PRELOAD"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00100000, "IMAGE_SCN_ALIGN_1BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00200000, "IMAGE_SCN_ALIGN_2BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00300000, "IMAGE_SCN_ALIGN_4BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00400000, "IMAGE_SCN_ALIGN_8BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00500000, "IMAGE_SCN_ALIGN_16BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00600000, "IMAGE_SCN_ALIGN_32BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00700000,"IMAGE_SCN_ALIGN_64BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00800000,"IMAGE_SCN_ALIGN_128BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00900000,"IMAGE_SCN_ALIGN_256BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00A00000,"IMAGE_SCN_ALIGN_512BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00B00000,"IMAGE_SCN_ALIGN_1024BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00C00000,"IMAGE_SCN_ALIGN_2048BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00D00000,"IMAGE_SCN_ALIGN_4096BYTES")); 
-  mapSectionFlags.insert(pair<uint16_t, string>(0x00E00000,"IMAGE_SCN_ALIGN_8192BYTES"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x01000000,"IMAGE_SCN_LNK_NRELOC_OVFL"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x02000000,"IMAGE_SCN_MEM_DISCARDABLE"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x04000000,"IMAGE_SCN_MEM_NOT_CACHED"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x08000000,"IMAGE_SCN_MEM_NOT_PAGED"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x10000000,"IMAGE_SCN_MEM_SHARED"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x20000000,"IMAGE_SCN_MEM_EXECUTE"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x40000000,"IMAGE_SCN_MEM_READ"));
-  mapSectionFlags.insert(pair<uint16_t, string>(0x80000000,"IMAGE_SCN_MEM_WRITE"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00000008, "IMAGE_SCN_TYPE_NO_PAD"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00000020, "IMAGE_SCN_CNT_CODE"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00000040, "IMAGE_SCN_CNT_INITIALIZED_DATA"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00000080, "IMAGE_SCN_CNT_UNINITIALIZED_ DATA"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00000100, "IMAGE_SCN_LNK_OTHER"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00000200, "IMAGE_SCN_LNK_INFO"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00000800, "IMAGE_SCN_LNK_REMOVE"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00001000, "IMAGE_SCN_LNK_COMDAT"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00008000, "IMAGE_SCN_GPREL"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00020000, "IMAGE_SCN_MEM_PURGEABLE"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00020000, "IMAGE_SCN_MEM_16BIT"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00040000, "IMAGE_SCN_MEM_LOCKED"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00080000, "IMAGE_SCN_MEM_PRELOAD"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00100000, "IMAGE_SCN_ALIGN_1BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00200000, "IMAGE_SCN_ALIGN_2BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00300000, "IMAGE_SCN_ALIGN_4BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00400000, "IMAGE_SCN_ALIGN_8BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00500000, "IMAGE_SCN_ALIGN_16BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00600000, "IMAGE_SCN_ALIGN_32BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00700000,"IMAGE_SCN_ALIGN_64BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00800000,"IMAGE_SCN_ALIGN_128BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00900000,"IMAGE_SCN_ALIGN_256BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00A00000,"IMAGE_SCN_ALIGN_512BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00B00000,"IMAGE_SCN_ALIGN_1024BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00C00000,"IMAGE_SCN_ALIGN_2048BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00D00000,"IMAGE_SCN_ALIGN_4096BYTES")); 
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00E00000,"IMAGE_SCN_ALIGN_8192BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x01000000,"IMAGE_SCN_LNK_NRELOC_OVFL"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x02000000,"IMAGE_SCN_MEM_DISCARDABLE"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x04000000,"IMAGE_SCN_MEM_NOT_CACHED"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x08000000,"IMAGE_SCN_MEM_NOT_PAGED"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x10000000,"IMAGE_SCN_MEM_SHARED"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x20000000,"IMAGE_SCN_MEM_EXECUTE"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x40000000,"IMAGE_SCN_MEM_READ"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x80000000,"IMAGE_SCN_MEM_WRITE"));
 
   mapPEFlagTypes.insert(pair<uint16_t, string>(0x0001, "IMAGE_FILE_RELOCS_STRIPPED"));
   mapPEFlagTypes.insert(pair<uint16_t, string>(0x0002, "IMAGE_FILE_EXECUTABLE_IMAGE"));
@@ -226,7 +234,48 @@ void PE::mapHeaderFlags() {
   mapImageCharacteristics.insert(pair<uint16_t, string>(0x4000, "IMAGE_DLLCHARACTERISTICS_GUARD_CF"));
   mapImageCharacteristics.insert(pair<uint16_t, string>(0x8000, "IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE"));
 
+  mapMachineType.insert(pair<uint16_t, string>(0x0, "IMAGE_FILE_MACHINE_UNKNOWN"));
+  mapMachineType.insert(pair<uint16_t, string>(0x200, "IMAGE_FILE_MACHINE_IA64"));
+  mapMachineType.insert(pair<uint16_t, string>(0x14c, "IMAGE_FILE_MACHINE_I386"));
+  mapMachineType.insert(pair<uint16_t, string>(0x8664, "IMAGE_FILE_MACHINE_AMD64"));
+  mapMachineType.insert(pair<uint16_t, string>(0x1c0, "IMAGE_FILE_MACHINE_ARM"));
+  mapMachineType.insert(pair<uint16_t, string>(0xaa64, "IMAGE_FILE_MACHINE_ARM64"));
+  mapMachineType.insert(pair<uint16_t, string>(0x1c4, "IMAGE_FILE_MACHINE_ARMNT"));
+  mapMachineType.insert(pair<uint16_t, string>(0xebc, "IMAGE_FILE_MACHINE_EBC"));
 
+  mapImageSubsystem.insert(pair<uint8_t, string>(0, "IMAGE_SUBSYSTEM_UNKNOWN"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(1, "IMAGE_SUBSYSTEM_NATIVE"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(2, "IMAGE_SUBSYSTEM_WINDOWS_GUI"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(3, "IMAGE_SUBSYSTEM_WINDOWS_CUI"));
+
+  mapImageSubsystem.insert(pair<uint8_t, string>(5, "IMAGE_SUBSYSTEM_OS2_CUI"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(7, "IMAGE_SUBSYSTEM_POSIX_CUI"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(8, "IMAGE_SUBSYSTEM_NATIVE_WINDOWS"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(9, "IMAGE_SUBSYSTEM_WINDOWS_CE_GUI"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(10, "IMAGE_SUBSYSTEM_EFI_APPLICATION"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(11, "IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(12, "IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(13, "IMAGE_SUBSYSTEM_EFI_ROM"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(14, "IMAGE_SUBSYSTEM_XBOX"));
+  mapImageSubsystem.insert(pair<uint8_t, string>(16, "IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION"));
+
+
+}
+
+void PE::readSections(std::ifstream &in, Section sections[]) {
+
+  for (int idx = 0; idx < numberOfSections_u16; idx++) {
+    sections[idx].setName(in);
+    sections[idx].setVSize(read32_le(in));
+    sections[idx].setVA(read32_le(in));
+    sections[idx].setRawDataSz(read32_le(in));
+    sections[idx].setRawDataPtr(read32_le(in));
+    sections[idx].setPtrReloc(read32_le(in));
+    sections[idx].setPtrLineNum(read32_le(in));
+    sections[idx].setRelocNum(read32_le(in));
+    sections[idx].setLineNum(read32_le(in));
+    sections[idx].setCharacter(read32_le(in));
+  }
 }
 // uint64_t rva_to_offset(int numberOfSections, uint64_t rva, 
 //                            section_table_t *sections) {
@@ -245,7 +294,7 @@ void PE::mapHeaderFlags() {
 
 void PE::readDatadir(std::ifstream &in, DataDir dataDir[]) {
   // Reading Data Directories
-  for (uint32_t idx = 0; idx < numberOfRvaAndSizes; idx++) {
+  for (uint32_t idx = 0; idx < numberOfRvaAndSizes_u32; idx++) {
     dataDir[idx].setVA(read32_le(in));
     dataDir[idx].setSize(read32_le(in));
     dataDir[idx].setOffset(0);  // setting file offset is 
@@ -254,22 +303,7 @@ void PE::readDatadir(std::ifstream &in, DataDir dataDir[]) {
 }
 
 // void PE::readSections(std::fstream in) {
-//   // Reading Sections data
 
-//   Section sec[numberOfSections];
-
-//   for (int idx = 0; idx < numberOfSections; idx++) {
-//     sec[idx].setName(in.read(8));
-//     sec[idx].setVSize(in.read(); // 32 bits);
-//     sec[idx].setVA(in.read(); // 32 bits);
-//     sec[idx].setRawDataSz(in.read(); // 32 bits);
-//     sec[idx].setRawDataPtr(in.read(); // 32 bits);
-//     sec[idx].setPtrReloc(in.read(); // 32 bits);
-//     sec[idx].setPtrLineNum(in.read(); // 32 bits);
-//     sec[idx].setRelocNum(in.read(); // 16 bits);
-//     sec[idx].setLineNum(in.read(); // 16 bits);
-//     sec[idx].setCharacter(in.read(); // 32 bits);
-//   }
 // }
 
 
