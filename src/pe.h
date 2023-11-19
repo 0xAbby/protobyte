@@ -34,7 +34,7 @@ class DataDir {
     ~DataDir() { }
 
     void setOffset(uint32_t offset) { this->offset = offset; }
-    void setVA(uint32_t va) { this->virtualAddr = va; }
+    void setVirtualAddress(uint32_t va) { this->virtualAddr = va; }
     void setSize(uint32_t sz) { this->size = sz;   }
 
     uint64_t getOffset() { return this->offset; }
@@ -45,34 +45,43 @@ class DataDir {
 class Section {
   private:
     // section table
-    char        name[7];
-    uint32_t    virtualSize;
-    uint32_t    virtualAddr;
-    uint32_t    sizeOfRawData;
-    uint32_t    ptrToRawData;
-    uint32_t    ptrToReloc;
-    uint32_t    ptrToLineNum;
-    uint32_t    numberOfReloc;
-    uint32_t    numberOfLineNum;
-    uint32_t    characteristics;
+    char  name[8];
+    uint32_t    virtualSize_u32;
+    uint32_t    virtualAddr_u32;
+    uint32_t    sizeOfRawData_u32;
+    uint32_t    pointerToRawData_u32;
+    uint32_t    pointerToRelocations_u32;
+    uint32_t    pointerToLinenumbers_u32;
+    uint16_t    numberOfRelocations_u16;
+    uint16_t    numberOfLineNumbers_u16;
+    uint32_t    characteristics_u32;
   public:
 
     Section() { }
     ~Section() { }
 
     void setName(std::ifstream &in) { 
-      in.get(this->name, 8); 
+      for(int idx = 0 ; idx < 8; idx++){
+        name[idx] = in.get();
+      }
+      
     }
-    void setVSize(uint32_t vsz) { this->virtualSize = vsz; }
-    void setVA(uint32_t va) { this->virtualAddr = va; }
-    void setRawDataSz(uint32_t sz) { this-> sizeOfRawData = sz; }
-    void setRawDataPtr(uint32_t ptr) { this->ptrToRawData = ptr; }
-    void setPtrReloc(uint32_t ptr) { this->ptrToReloc = ptr; }
-    void setPtrLineNum(uint32_t ptr ) { this->ptrToLineNum = ptr; } 
-    void setRelocNum(uint32_t n) { this->numberOfReloc = n; }
-    void setLineNum(uint32_t n) { this->numberOfLineNum = n; }
-    void setCharacter(uint32_t ch) { this->characteristics = ch ;}
+    void setVirtualSize(uint32_t vsz) { this->virtualSize_u32 = vsz; }
+    void setVirtualAddress(uint32_t va) { this->virtualAddr_u32 = va; }
+    void setRawDataSize(uint32_t sz) { this-> sizeOfRawData_u32 = sz; }
+    void setRawDataPointer(uint32_t ptr) { this->pointerToRawData_u32 = ptr; }
+    void setPointerToRelocations(uint32_t ptr) { this->pointerToRelocations_u32 = ptr; }
+    void setPointerToLinenumbers(uint32_t ptr ) { this->pointerToLinenumbers_u32 = ptr; } 
+    void setNumberOfRelocations(uint16_t n) { this->numberOfRelocations_u16 = n; }
+    void setNumberOfLineNumbers(uint16_t n) { this->numberOfLineNumbers_u16 = n; }
+    void setCharacteristics(uint32_t ch) { this->characteristics_u32 = ch ;}
 
+    std::string getName(){
+      return this->name;
+    }
+    uint32_t getVirtualSize() { return virtualSize_u32; }
+    uint32_t getVirtualAddress() { return virtualAddr_u32; }
+    uint32_t getCharacteristics() { return characteristics_u32; }
 };
 
 class PE {
@@ -192,9 +201,28 @@ public:
   uint16_t getMachineType() {
     return this->machine_u16;
   }
+  uint16_t getCharacteristics() {
+    return this->characteristics_u16;
+  }
 
   uint16_t getDllCharacterics() {
     return this->dllCharacteristics_u16;
+  }
+
+  uint32_t getChecksum() {
+    return this->checkSum_u32;
+  }
+  uint32_t getBaseOfCode() {
+    return this->baseOfCode_u32;
+  }
+  uint32_t getSectionAlignment(){
+    return this->sectionAlignment_u32;
+  }
+  uint32_t getnumberOfRvaAndSizes() {
+    return this->numberOfRvaAndSizes_u32;
+  }
+  uint64_t getImageBase(){
+    return this->imageBase_u64;
   }
 
   PE() { }
@@ -214,58 +242,43 @@ public:
 
 
 // Import Table
-typedef struct import_directory_t {
-  uint32_t importLookupTableRVA;// RVA of the import lookup table
-  uint32_t timeStamp;
-  uint32_t forwarderChain;
-  uint32_t nameRVA;             // address of an ASCII string name of the DLL
-  uint32_t importAddressRVA;
-} import_directory_t;
+// typedef struct import_directory_t {
+//   uint32_t importLookupTableRVA;// RVA of the import lookup table
+//   uint32_t timeStamp;
+//   uint32_t forwarderChain;
+//   uint32_t nameRVA;             // address of an ASCII string name of the DLL
+//   uint32_t importAddressRVA;
+// } import_directory_t;
 
-// export address table
-typedef struct export_address_name_t {
-  char   names[1024];
-} export_address_name_t;
 
 // export table
-typedef struct export_directory_t {
-  uint32_t    exportFlags;      // Reserved, must be 0.
-  uint32_t    timeStamp;        // The time and date that the export
-  // data was created.
+// typedef struct export_directory_t {
+//   uint32_t    exportFlags;      // Reserved, must be 0.
+//   uint32_t    timeStamp;        // The time and date that the export
+//   // data was created.
 
-  uint16_t    majorVer;
-  uint16_t    minorVer;
-  uint32_t    nameRVA;          // The address of the ASCII string that contains
-  // the name of the DLL.
+//   uint16_t    majorVer;
+//   uint16_t    minorVer;
+//   uint32_t    nameRVA;          // The address of the ASCII string that contains
+//   // the name of the DLL.
 
-  uint32_t    ordinalBase;      // The starting ordinal number for exports in
-  // this image. This field specifies the
-  // starting ordinal number for the export
-  // address table.
+//   uint32_t    ordinalBase;      // The starting ordinal number for exports in
+//   // this image. This field specifies the
+//   // starting ordinal number for the export
+//   // address table.
 
-  uint32_t    addrTableEntries;     // The number of entries in the
-  // export address table.
-  uint32_t    numberOfNamePointers;
-  uint32_t    exportAddrTableRVA; // The address of the export address table,
-  uint32_t    namePtrRVA;
-  uint32_t    ordinalTableRVA;
-  export_address_name_t *exportAddr_name_t;
-} export_directory_t;
+//   uint32_t    addrTableEntries;     // The number of entries in the
+//   // export address table.
+//   uint32_t    numberOfNamePointers;
+//   uint32_t    exportAddrTableRVA; // The address of the export address table,
+//   uint32_t    namePtrRVA;
+//   uint32_t    ordinalTableRVA;
+//   export_address_name_t *exportAddr_name_t;
+// } export_directory_t;
 
 
 // misc functions to help with the general parsing operations
 // uint64_t  rva_to_offset(int numberOfSections, uint64_t rva,
 //                         section_table_t *sections);
-
-// functions to output PE info
-// void      print_pe_characteristics(uint16_t ch);
-// void      print_machine(uint16_t mach);
-// void      print_magic(uint16_t magic);
-// void      print_subsystem(uint16_t system);
-// void      print_dllcharacteristics(uint16_t ch);
-// void      print_section_characteristics(uint32_t ch);
-// void      print_exports(dos_header_t *dosHeader);
-// void      print_imports(dos_header_t *dosHeader);
-
 
 #endif

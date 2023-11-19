@@ -18,15 +18,27 @@ void PE::parse(std::ifstream &in) {
   Section sections[numberOfSections_u16];
   readSections(in, sections);
 
-
   // print PE info
-
+  using namespace std;
+  cout << "Parsed info from: \n\n";
   // print magic bytes
+  cout << "Magic bytes: 0x" << getDosMagic() << endl;
   // print PE offset
+  cout << "PE offset: 0x" << hex << getElfanew() << endl;
   // print number of section
+  cout << "Number of sections: " << getNumberOfSections() << endl;
   // print characteristics
+  cout << "Characteristics: 0x" << hex << getCharacteristics() << endl << endl;
   // print sections information
-  mapHeaderFlags();
+  for(auto idx: sections){
+    cout << "  Name: " << idx.getName() << endl;
+    cout << "  Virtual size: 0x" << hex << idx.getVirtualSize() << endl;
+    cout << "  Virtual Address: 0x" << hex << idx.getVirtualAddress() << endl;
+    
+    cout << "  Characteristics: 0x" << hex << idx.getCharacteristics() << endl;
+    cout << endl;
+  }
+  // mapHeaderFlags();
 }
 PE::~PE() {
 
@@ -81,7 +93,7 @@ uint16_t read16_le(std::ifstream &in) {
 
 uint32_t read32_le(std::ifstream &in) {
   uint32_t value = 0;
-  char ch[5] = {0};
+  char ch[4] = {0};
 
   in.read(ch, 4);
   value = ch[0];
@@ -134,9 +146,11 @@ void PE::readPE(std::ifstream &in) {
 
   if (optionalHeaderMagic_u16 == OPTIONAL_IMAGE_PE32_plus) {
     imageBase_u64 = read64_le(in); 
+   // std::cout << "64bit PE \n";
   } else {
+  //  std::cout << "32bit PE\n";
     baseOfData_u32 = read32_le(in);
-    imageBase_u64 = read32_le(in); // possible bug?
+    imageBase_u64 = read32_le(in);
   }
   sectionAlignment_u32 = read32_le(in);
   fileAlignment_u32 = read32_le(in);
@@ -189,22 +203,22 @@ void PE::mapHeaderFlags() {
   mapSectionFlags.insert(pair<uint32_t, string>(0x00400000, "IMAGE_SCN_ALIGN_8BYTES"));
   mapSectionFlags.insert(pair<uint32_t, string>(0x00500000, "IMAGE_SCN_ALIGN_16BYTES"));
   mapSectionFlags.insert(pair<uint32_t, string>(0x00600000, "IMAGE_SCN_ALIGN_32BYTES"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x00700000,"IMAGE_SCN_ALIGN_64BYTES"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x00800000,"IMAGE_SCN_ALIGN_128BYTES"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x00900000,"IMAGE_SCN_ALIGN_256BYTES"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x00A00000,"IMAGE_SCN_ALIGN_512BYTES"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x00B00000,"IMAGE_SCN_ALIGN_1024BYTES"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x00C00000,"IMAGE_SCN_ALIGN_2048BYTES"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x00D00000,"IMAGE_SCN_ALIGN_4096BYTES")); 
-  mapSectionFlags.insert(pair<uint32_t, string>(0x00E00000,"IMAGE_SCN_ALIGN_8192BYTES"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x01000000,"IMAGE_SCN_LNK_NRELOC_OVFL"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x02000000,"IMAGE_SCN_MEM_DISCARDABLE"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x04000000,"IMAGE_SCN_MEM_NOT_CACHED"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x08000000,"IMAGE_SCN_MEM_NOT_PAGED"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x10000000,"IMAGE_SCN_MEM_SHARED"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x20000000,"IMAGE_SCN_MEM_EXECUTE"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x40000000,"IMAGE_SCN_MEM_READ"));
-  mapSectionFlags.insert(pair<uint32_t, string>(0x80000000,"IMAGE_SCN_MEM_WRITE"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00700000, "IMAGE_SCN_ALIGN_64BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00800000, "IMAGE_SCN_ALIGN_128BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00900000, "IMAGE_SCN_ALIGN_256BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00A00000, "IMAGE_SCN_ALIGN_512BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00B00000, "IMAGE_SCN_ALIGN_1024BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00C00000, "IMAGE_SCN_ALIGN_2048BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00D00000, "IMAGE_SCN_ALIGN_4096BYTES")); 
+  mapSectionFlags.insert(pair<uint32_t, string>(0x00E00000, "IMAGE_SCN_ALIGN_8192BYTES"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x01000000, "IMAGE_SCN_LNK_NRELOC_OVFL"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x02000000, "IMAGE_SCN_MEM_DISCARDABLE"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x04000000, "IMAGE_SCN_MEM_NOT_CACHED"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x08000000, "IMAGE_SCN_MEM_NOT_PAGED"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x10000000, "IMAGE_SCN_MEM_SHARED"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x20000000, "IMAGE_SCN_MEM_EXECUTE"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x40000000, "IMAGE_SCN_MEM_READ"));
+  mapSectionFlags.insert(pair<uint32_t, string>(0x80000000, "IMAGE_SCN_MEM_WRITE"));
 
   mapPEFlagTypes.insert(pair<uint16_t, string>(0x0001, "IMAGE_FILE_RELOCS_STRIPPED"));
   mapPEFlagTypes.insert(pair<uint16_t, string>(0x0002, "IMAGE_FILE_EXECUTABLE_IMAGE"));
@@ -266,15 +280,16 @@ void PE::readSections(std::ifstream &in, Section sections[]) {
 
   for (int idx = 0; idx < numberOfSections_u16; idx++) {
     sections[idx].setName(in);
-    sections[idx].setVSize(read32_le(in));
-    sections[idx].setVA(read32_le(in));
-    sections[idx].setRawDataSz(read32_le(in));
-    sections[idx].setRawDataPtr(read32_le(in));
-    sections[idx].setPtrReloc(read32_le(in));
-    sections[idx].setPtrLineNum(read32_le(in));
-    sections[idx].setRelocNum(read32_le(in));
-    sections[idx].setLineNum(read32_le(in));
-    sections[idx].setCharacter(read32_le(in));
+    sections[idx].setVirtualSize(read32_le(in));
+    sections[idx].setVirtualAddress(read32_le(in));
+    sections[idx].setRawDataSize(read32_le(in));
+    sections[idx].setRawDataPointer(read32_le(in));
+    sections[idx].setPointerToRelocations(read32_le(in));
+    sections[idx].setPointerToLinenumbers(read32_le(in));
+    sections[idx].setNumberOfRelocations(read16_le(in));
+    sections[idx].setNumberOfLineNumbers(read16_le(in));
+    sections[idx].setCharacteristics(read32_le(in));
+
   }
 }
 // uint64_t rva_to_offset(int numberOfSections, uint64_t rva, 
@@ -295,24 +310,9 @@ void PE::readSections(std::ifstream &in, Section sections[]) {
 void PE::readDatadir(std::ifstream &in, DataDir dataDir[]) {
   // Reading Data Directories
   for (uint32_t idx = 0; idx < numberOfRvaAndSizes_u32; idx++) {
-    dataDir[idx].setVA(read32_le(in));
+    dataDir[idx].setVirtualAddress(read32_le(in));
     dataDir[idx].setSize(read32_le(in));
-    dataDir[idx].setOffset(0);  // setting file offset is 
+    //dataDir[idx].setOffset(0);  // setting file offset is 
                                 // possible after sections info is read.
   }
 }
-
-// void PE::readSections(std::fstream in) {
-
-// }
-
-
-
-// char *PE::read_str(std::ifstream &in, int count) {
-//   char *ch_ptr = (char*) malloc(sizeof(char)*count);
-//   for(int i = 0; i < count; i++) {
-//     ch_ptr[i] = fgetc(in);
-//   }
-//   ch_ptr[strlen(ch_ptr)] = 0;
-//   return ch_ptr;
-// }

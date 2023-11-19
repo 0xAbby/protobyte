@@ -24,6 +24,12 @@ TEST_F(PETest, NumberOfSections) { ASSERT_EQ(pe.getNumberOfSections(), 8); }
 
 TEST_F(PETest, DllCharacteristics) { ASSERT_EQ(pe.getDllCharacterics(), 0x4160); }
 
+TEST_F(PETest, BaseOfCode) { ASSERT_EQ(pe.getBaseOfCode(), 0x1000); }
+
+TEST_F(PETest, SectionAlignment) { ASSERT_EQ(pe.getSectionAlignment(),  0x1000); }
+
+TEST_F(PETest, NumberOfRVA) { ASSERT_EQ(pe.getnumberOfRvaAndSizes(), 0x10); }
+
 int main(int argc, char*argv[]) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

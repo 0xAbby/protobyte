@@ -57,6 +57,8 @@ FileIO::FileIO(int argc, char *argv[]) {
 
   for(int idx = 1; idx < argc; idx++) {
     // read headers
+    std::cout << "Parsing " << argv[idx] << std::endl;
+    std::cout << "-----------------------" << std::endl;
     PE pe(argv[idx]);
   }
 }
