@@ -7,7 +7,7 @@
 // Author:
 //  Abdullah Ada (0xabby)
 //
-#include "pe.h"
+#include "headers.h"
 
 void PE::parse(std::ifstream &in) {
   // parsing process in steps
@@ -110,13 +110,13 @@ uint64_t read64_le(std::ifstream &in) {
 
   in.read(ch, 8);
   value = ch[0];
-  value |= ch[1] << 8;
-  value |= ch[2] << 16;
-  value |= ch[3] << 24;
-  value |= ch[4] << 32;
-  value |= ch[5] << 40;
-  value |= ch[6] << 48;
-  value |= ch[7] << 54;
+  value |= long(ch[1]) << 8;
+  value |= long(ch[2]) << 16;
+  value |= long(ch[3]) << 24;
+  value |= long(ch[4]) << 32;
+  value |= long(ch[5]) << 40;
+  value |= long(ch[6]) << 48;
+  value |= long(ch[7]) << 54;
   
   return value;
 }

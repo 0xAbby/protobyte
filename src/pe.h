@@ -10,7 +10,6 @@
 #define PE_H
 
 #include "headers.h"
-#include "file_io.h"
 
 // PE image type
 #define OPTIONAL_IMAGE_PE32      0x10b
@@ -21,71 +20,9 @@ uint16_t read16_le(std::ifstream &in);
 uint32_t read32_le(std::ifstream &in);
 uint64_t read64_le(std::ifstream &in);
 
-
-class DataDir {
-  private:
-    // Data Directory
-    uint64_t    offset;
-    uint32_t    virtualAddr;
-    uint32_t    size;
-
-  public:
-    DataDir() {}
-    ~DataDir() { }
-
-    void setOffset(uint32_t offset) { this->offset = offset; }
-    void setVirtualAddress(uint32_t va) { this->virtualAddr = va; }
-    void setSize(uint32_t sz) { this->size = sz;   }
-
-    uint64_t getOffset() { return this->offset; }
-    uint32_t getVA()  { return this->virtualAddr; }
-    uint64_t getSize() { return this->size; }      
-};
-
-class Section {
-  private:
-    // section table
-    char  name[8];
-    uint32_t    virtualSize_u32;
-    uint32_t    virtualAddr_u32;
-    uint32_t    sizeOfRawData_u32;
-    uint32_t    pointerToRawData_u32;
-    uint32_t    pointerToRelocations_u32;
-    uint32_t    pointerToLinenumbers_u32;
-    uint16_t    numberOfRelocations_u16;
-    uint16_t    numberOfLineNumbers_u16;
-    uint32_t    characteristics_u32;
-  public:
-
-    Section() { }
-    ~Section() { }
-
-    void setName(std::ifstream &in) { 
-      for(int idx = 0 ; idx < 8; idx++){
-        name[idx] = in.get();
-      }
-      
-    }
-    void setVirtualSize(uint32_t vsz) { this->virtualSize_u32 = vsz; }
-    void setVirtualAddress(uint32_t va) { this->virtualAddr_u32 = va; }
-    void setRawDataSize(uint32_t sz) { this-> sizeOfRawData_u32 = sz; }
-    void setRawDataPointer(uint32_t ptr) { this->pointerToRawData_u32 = ptr; }
-    void setPointerToRelocations(uint32_t ptr) { this->pointerToRelocations_u32 = ptr; }
-    void setPointerToLinenumbers(uint32_t ptr ) { this->pointerToLinenumbers_u32 = ptr; } 
-    void setNumberOfRelocations(uint16_t n) { this->numberOfRelocations_u16 = n; }
-    void setNumberOfLineNumbers(uint16_t n) { this->numberOfLineNumbers_u16 = n; }
-    void setCharacteristics(uint32_t ch) { this->characteristics_u32 = ch ;}
-
-    std::string getName(){
-      return this->name;
-    }
-    uint32_t getVirtualSize() { return virtualSize_u32; }
-    uint32_t getVirtualAddress() { return virtualAddr_u32; }
-    uint32_t getCharacteristics() { return characteristics_u32; }
-};
-
 class PE {
   private:
+    FileIO file1;
     // DOS header
     uint16_t   dosMagic_u16;      // Magic DOS signature MZ
     uint16_t   e_cblp_u16;		  // Bytes on last page of file
@@ -172,6 +109,74 @@ class PE {
 
 public:
 
+  ///////////////
+  class DataDir {
+    private:
+      // Data Directory
+      uint64_t    offset;
+      uint32_t    virtualAddr;
+      uint32_t    size;
+
+    public:
+      DataDir() {}
+      ~DataDir() { }
+
+      void setOffset(uint32_t offset) { this->offset = offset; }
+      void setVirtualAddress(uint32_t va) { this->virtualAddr = va; }
+      void setSize(uint32_t sz) { this->size = sz;   }
+
+      auto getOffset() const { return this->offset; }
+      auto getVA() const { return this->virtualAddr; }
+      auto getSize() const { return this->size; }      
+  };
+
+  class Section {
+    private:
+      // section table
+      char  name[8];
+      uint32_t    virtualSize_u32;
+      uint32_t    virtualAddr_u32;
+      uint32_t    sizeOfRawData_u32;
+      uint32_t    pointerToRawData_u32;
+      uint32_t    pointerToRelocations_u32;
+      uint32_t    pointerToLinenumbers_u32;
+      uint16_t    numberOfRelocations_u16;
+      uint16_t    numberOfLineNumbers_u16;
+      uint32_t    characteristics_u32;
+    public:
+
+      Section() { }
+      ~Section() { }
+
+      void setName(std::ifstream &in) { 
+        for(int idx = 0 ; idx < 8; idx++){
+          name[idx] = in.get();
+        }
+        
+      }
+      void setVirtualSize(uint32_t vsz) { this->virtualSize_u32 = vsz; }
+      void setVirtualAddress(uint32_t va) { this->virtualAddr_u32 = va; }
+      void setRawDataSize(uint32_t sz) { this-> sizeOfRawData_u32 = sz; }
+      void setRawDataPointer(uint32_t ptr) { this->pointerToRawData_u32 = ptr; }
+      void setPointerToRelocations(uint32_t ptr) { 
+        this->pointerToRelocations_u32 = ptr; 
+      }
+      void setPointerToLinenumbers(uint32_t ptr) { 
+        this->pointerToLinenumbers_u32 = ptr; 
+      } 
+      void setNumberOfRelocations(uint16_t n) { this->numberOfRelocations_u16 = n; }
+      void setNumberOfLineNumbers(uint16_t n) { this->numberOfLineNumbers_u16 = n; }
+      void setCharacteristics(uint32_t ch) { this->characteristics_u32 = ch ;}
+
+      std::string getName(){
+        return this->name;
+      }
+      auto getVirtualSize() const { return virtualSize_u32; }
+      auto getVirtualAddress() const { return virtualAddr_u32; }
+      auto getCharacteristics() const { return characteristics_u32; }
+  };
+
+  ////////////////* functions  *///////////////////
   void parse(std::ifstream &in);
   void readDOSHeader(std::ifstream &in);
   void readPE(std::ifstream &in);
@@ -179,64 +184,32 @@ public:
   void readSections(std::ifstream &in, Section sections[]);
   void mapHeaderFlags();
 
-  uint16_t getDosMagic() {
-    return this->dosMagic_u16;
-  }  
+  auto getDosMagic() const { return this->dosMagic_u16; }  
+  auto getSections() const { return this->numberOfSections_u16; }
+  auto getElfanew() const { return this->e_lfanew_u32;  }
+  auto getPESignature() const { return this->peSignature_u32; }
+  auto getNumberOfSections() const { return this->numberOfSections_u16; }
+  auto getMachineType() const { return this->machine_u16; }
+  auto getCharacteristics() const { return this->characteristics_u16; }
 
+  auto getDllCharacterics() const { return this->dllCharacteristics_u16; }
 
-  uint16_t getSections() {
-    return this->numberOfSections_u16;
-  }
-
-  uint32_t getElfanew() {
-    return this->e_lfanew_u32;
-  }
-  uint32_t getPESignature() {
-    return this->peSignature_u32;
-  }
-  uint16_t getNumberOfSections() {
-    return this->numberOfSections_u16;
-  }
-
-  uint16_t getMachineType() {
-    return this->machine_u16;
-  }
-  uint16_t getCharacteristics() {
-    return this->characteristics_u16;
-  }
-
-  uint16_t getDllCharacterics() {
-    return this->dllCharacteristics_u16;
-  }
-
-  uint32_t getChecksum() {
-    return this->checkSum_u32;
-  }
-  uint32_t getBaseOfCode() {
-    return this->baseOfCode_u32;
-  }
-  uint32_t getSectionAlignment(){
-    return this->sectionAlignment_u32;
-  }
-  uint32_t getnumberOfRvaAndSizes() {
-    return this->numberOfRvaAndSizes_u32;
-  }
-  uint64_t getImageBase(){
-    return this->imageBase_u64;
-  }
+  auto getChecksum() const { return this->checkSum_u32;  }
+  auto getBaseOfCode() const { return this->baseOfCode_u32; }
+  auto getSectionAlignment() const { return this->sectionAlignment_u32;}
+  auto getnumberOfRvaAndSizes() const { return this->numberOfRvaAndSizes_u32;}
+  auto getImageBase() const { return this->imageBase_u64; }
 
   PE() { }
   PE(std::string filename) {
-    std::ifstream in(filename, std::ios::in | std::ios::binary);
-    parse(in);
+    init(filename);
   }
 
-  void init(std::string filename){
+  void init(std::string filename) {
     std::ifstream in(filename, std::ios::in | std::ios::binary);
     parse(in);
   }
   ~PE();
-
 
 };
 
