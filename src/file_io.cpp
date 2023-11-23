@@ -9,7 +9,6 @@
 //
 #include "headers.h"
 
-
 // char *read_str(std::ifstream &in, int count) {
 //   char *ch_ptr = (char*) malloc(sizeof(char)*count);
 //   for(int i = 0; i < count; i++) {
@@ -53,18 +52,61 @@
 //   return value;
 // }
 
-FileIO::FileIO(int argc, char *argv[]) {
+template <typename T> T 
+FileIO::read8_le(std::ifstream &in) {
+  uint8_t value = 0;
+  char ch[1] = {0};
 
-  for(int idx = 1; idx < argc; idx++) {
-    // read headers
-    std::cout << "Parsing " << argv[idx] << std::endl;
-    std::cout << "-----------------------" << std::endl;
-    PE pe(argv[idx]);
-  }
-}
-
-FileIO::~FileIO() {
+  in.read(ch, 1);
+  value = ch[0];
   
+  return value;
 }
 
+template <typename T> T
+ FileIO::read16_le(std::ifstream &in) {
+  uint16_t value = 0;
+  char ch[3] = {0};
 
+  in.read(ch, 2);
+  value = ch[0];
+  value |= ch[1] << 8;
+  
+  return value;
+}
+
+template <typename T> T 
+ FileIO::read32_le(std::ifstream &in) {
+  uint32_t value = 0;
+  char ch[4] = {0};
+
+  in.read(ch, 4);
+  value = ch[0];
+  value |= ch[1] << 8;
+  value |= ch[2] << 16;
+  value |= ch[3] << 24;
+  
+  return value;
+}
+
+template <typename T> T 
+ FileIO::read64_le(std::ifstream &in) {
+  uint64_t value = 0;
+  char ch[9] = {0};
+
+  in.read(ch, 8);
+  value = ch[0];
+  value |= long(ch[1]) << 8;
+  value |= long(ch[2]) << 16;
+  value |= long(ch[3]) << 24;
+  value |= long(ch[4]) << 32;
+  value |= long(ch[5]) << 40;
+  value |= long(ch[6]) << 48;
+  value |= long(ch[7]) << 54;
+  
+  return value;
+}
+
+FileIO::FileIO(std::string filename) {  
+  PE pe(filename);
+}

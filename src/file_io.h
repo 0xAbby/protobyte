@@ -13,15 +13,21 @@
 
 #include "headers.h"
 
-class FileIO {
-private:
-  
 
-public:
-  FileIO(int argc, char *argv[]);
-  ~FileIO();
+class FileIO {
+  private:
+   
+
+  public:
+    FileIO() { }
+    FileIO(std::string filename);
+
+    
+    template <typename T> T read8_le(std::ifstream &in);
+    template <typename T> T read16_le(std::ifstream &in);
+    template <typename T> T read32_le(std::ifstream &in);
+    template <typename T> T read64_le(std::ifstream &in);
   
-  uint16_t read16_le(std::ifstream &in);
 };
 
 
