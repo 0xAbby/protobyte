@@ -8,13 +8,12 @@
 //  Abdullah Ada 
 //
 #include "headers.h" 
-#include "file_io.h"
 
 int main(int argc, char *argv[]) {
   if( argc < 2 ) {
     printf("please supply at least One valid PE file\n");
     exit(1);
   }
-  FileIO file(argc, argv);
+  FileIO fileObj(argv[1]);
   return 0;
 }

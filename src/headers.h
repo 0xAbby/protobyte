@@ -19,8 +19,9 @@
 #include <cstdint>
 #include <cstring>
 
-#include "pe.h"
 #include "file_io.h"
+#include "pe.h"
+#include "elf.h"
 
 
 #endif
