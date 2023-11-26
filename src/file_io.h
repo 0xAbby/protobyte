@@ -5,30 +5,21 @@
 //  https://github.com/0xAbby/binlyzer
 //
 // Author:
-//  Abdullah Ada 
-// 
+//  Abdullah Ada
+//
 
 #ifndef FILE_IO_H
 #define FILE_IO_H
 
 #include "headers.h"
 
-
 class FileIO {
-  private:
-   
+ private:
+ public:
+  FileIO() {}
+  FileIO(std::string filename);
 
-  public:
-    FileIO() { }
-    FileIO(std::string filename);
 
-    
-    template <typename T> T read8_le(std::ifstream &in);
-    template <typename T> T read16_le(std::ifstream &in);
-    template <typename T> T read32_le(std::ifstream &in);
-    template <typename T> T read64_le(std::ifstream &in);
-  
 };
-
 
 #endif
