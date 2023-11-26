@@ -30,6 +30,17 @@ TEST_F(PETest, SectionAlignment) { ASSERT_EQ(pe.getSectionAlignment(),  0x1000);
 
 TEST_F(PETest, NumberOfRVA) { ASSERT_EQ(pe.getnumberOfRvaAndSizes(), 0x10); }
 
+TEST_F(PETest, Checksum) { ASSERT_EQ(pe.getChecksum(), 0x001E7393); }
+
+// sections is arranged into 'sections' array, in file sample used here
+// 0 means first section, which is ".text"
+TEST_F(PETest, textSection) { ASSERT_TRUE(pe.getSection(0).getName().compare(".text")); }
+
+TEST_F(PETest, textVirtualSize) { ASSERT_TRUE(pe.getSection(0).getVirtualSize() == 0x001590DE); }
+
+// data section is the 3rd in the 'sections' array
+TEST_F(PETest, dataVirtualAddress) { ASSERT_TRUE(pe.getSection(2).getVirtualAddress() == 0x001B4000); }
+
 int main(int argc, char*argv[]) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

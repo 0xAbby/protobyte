@@ -14,6 +14,7 @@
 #include <fstream>
 #include <map>
 #include <utility>
+#include <vector>
 #include <cstdio>
 #include <stdlib.h>
 #include <cstdint>
