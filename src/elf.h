@@ -57,11 +57,21 @@ class ELF: public PE {
   uint64_t sh_entsize;
 
  public:
-  void parse(std::ifstream& file);
+  void parse64(std::ifstream& file);
+  void parse32(std::ifstream& file);
+  
   ELF() {}
   ELF(std::string filename) {
     std::ifstream file(filename, std::ios::binary);
-    parse(file);
+    file.read(reinterpret_cast<char*> (e_ident), 16);
+
+    if (1) {
+        parse32(file);
+    } else {
+        parse64(file);
+    }
+
+    
   }
 };
 

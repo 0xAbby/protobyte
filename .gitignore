@@ -2,4 +2,5 @@ unit_test/runTests
 binlyzer
 build/file_io.o
 build/pe.o
+build/elf.o
 .vscode

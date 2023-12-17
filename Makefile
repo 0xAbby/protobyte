@@ -12,14 +12,17 @@ SRC= ./src
 BUILD= ./build
 
 default: pe.o 
-	${CC} ${ARGS} -o binlyzer ${BUILD}/pe.o  ${BUILD}/file_io.o  ${SRC}/main.cpp
+	${CC} ${ARGS} -o binlyzer ${BUILD}/pe.o  ${BUILD}/file_io.o  ${BUILD}/elf.o ${SRC}/main.cpp
 
 
 pe.o: file_io.o
 	${CC} ${ARGS} -c ${SRC}/pe.cpp -o ${BUILD}/pe.o
 
-file_io.o:
+file_io.o: elf.o
 	${CC} ${ARGS} -c ${SRC}/file_io.cpp -o ${BUILD}/file_io.o
+
+elf.o:
+	${CC} ${ARGS} -c ${SRC}/elf.cpp -o ${BUILD}/elf.o
 
 unit_test:
 	cd $(UNIT_TEST) && make
