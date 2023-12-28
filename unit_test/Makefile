@@ -12,7 +12,7 @@ LINK= -lgtest -lgtest_main
 BUILD= ./build
 
 default: 
-	${CC} ${ARGS} runTests.cpp ${LINK} ../${BUILD}/pe.o  ../${BUILD}/file_io.o -o runTests
+	${CC} ${ARGS} runTests.cpp ${LINK} ../${BUILD}/pe.o  ../${BUILD}/elf.o ../${BUILD}/file_io.o -o runTests
 
 clean:
 	rm -rf ./runTests
