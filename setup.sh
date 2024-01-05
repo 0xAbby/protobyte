@@ -1,5 +1,5 @@
 #!/bin/bash
 
 make clean; make
-cd ./unit_test
+cd ./src/unit_test
 make 

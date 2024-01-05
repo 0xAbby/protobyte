@@ -1,12 +1,12 @@
-/** 
+/**
  * @file pe.h
  * @brief  Definitions and declarations for PE module.
- *           
+ *
  *
  *  https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
-*/
+ */
 #ifndef PE_H
 #define PE_H
 
@@ -16,18 +16,155 @@
 #define OPTIONAL_IMAGE_PE32 0x10b
 #define OPTIONAL_IMAGE_PE32_plus 0x20b
 
-uint8_t read_u8(std::ifstream& in);
-uint16_t read_u16(std::ifstream& in, bool littleEnd);
-uint32_t read_u32(std::ifstream& in, bool littleEnd);
-uint64_t read_u64(std::ifstream& in, bool littleEnd);
+/**
+ * @brief holds information for Data directories in a PE file format
+ *  such as Import table, export table, IAT table...etc.
+ *
+ */
+class DataDirectory {
+ public:
+  DataDirectory() {}
+  ~DataDirectory() {}
 
+  void setOffset(uint32_t offset);
+  void setVirtualAddress(uint32_t va);
+  void setSize(uint32_t sz);
+  void readDataDirectory(std::ifstream& in,
+                         DataDirectory dataDir[],
+                         uint32_t number);
+
+  auto getOffset() const;
+  auto getVA() const;
+  auto getSize() const;
+
+ private:
+  // Data Directory
+  uint64_t offset;
+  uint32_t virtualAddr;
+  uint32_t size;
+  uint32_t numberOfRva_u32;
+};
 
 /**
- * @brief holds information for PE file format, carries out PE-format specific operations, loading, reading
- * displaying header info.
+ * @brief holds information for PE sections in a PE file format
+ *  such as .text, .data, .rdata and so on.
+ *
+ */
+class PESection {
+ public:
+  PESection() {}
+  ~PESection() {}
+
+  void readSections(std::ifstream& in, PESection sections[], uint32_t number);
+
+  void setName(std::ifstream& in) {
+    for (int idx = 0; idx < 8; idx++)
+      name.insert(idx, 1, in.get());
+  }
+  void setVirtualSize(uint32_t vsz) { this->virtualSize_u32 = vsz; }
+  void setVirtualAddress(uint32_t va) { this->virtualAddr_u32 = va; }
+  void setRawDataSize(uint32_t sz) { this->sizeOfRawData_u32 = sz; }
+  void setRawDataPointer(uint32_t ptr) { this->pointerToRawData_u32 = ptr; }
+  void setPointerToRelocations(uint32_t ptr) {
+    this->pointerToRelocations_u32 = ptr;
+  }
+  void setPointerToLinenumbers(uint32_t ptr) {
+    this->pointerToLinenumbers_u32 = ptr;
+  }
+  void setNumberOfRelocations(uint16_t n) { this->numberOfRelocations_u16 = n; }
+  void setNumberOfLineNumbers(uint16_t n) { this->numberOfLineNumbers_u16 = n; }
+  void setCharacteristics(uint32_t ch) { this->characteristics_u32 = ch; }
+
+  std::string getName() { return this->name; }
+  auto getVirtualSize() const { return virtualSize_u32; }
+  auto getVirtualAddress() const { return virtualAddr_u32; }
+  auto getCharacteristics() const { return characteristics_u32; }
+
+ private:
+  // section table
+  std::string name;
+  uint32_t virtualSize_u32;
+  uint32_t virtualAddr_u32;
+  uint32_t sizeOfRawData_u32;
+  uint32_t pointerToRawData_u32;
+  uint32_t pointerToRelocations_u32;
+  uint32_t pointerToLinenumbers_u32;
+  uint16_t numberOfRelocations_u16;
+  uint16_t numberOfLineNumbers_u16;
+  uint32_t characteristics_u32;
+  uint32_t numberOfSections_u32;
+};
+
+class ImportDirectory {
+ public:
+  ImportDirectory();
+  ~ImportDirectory();
+
+ private:
+  uint32_t importLookupTableRVA_u32;
+  uint32_t timeStamp_u32;
+  uint32_t forwarderChain_u32;
+  uint32_t nameRVA_u32;
+  uint32_t importAddressRVA_u32;
+};
+
+class ExportDirectory {
+ public:
+  ExportDirectory();
+  ~ExportDirectory();
+
+ private:
+  uint32_t exportFlags_u32;  // Reserved.
+  uint32_t timeStamp_u32;    // time/date that the export data was created
+  uint16_t majorVersion_u16;
+  uint16_t minorVersion_u16;
+  uint32_t nameRVA_u32;      // Address of ASCII string to name of the DLL
+  uint32_t ordinalBase_u32;  // The starting ordinal number for exports in
+                             // this image. This field specifies the
+                             // starting ordinal number for the export
+                             // address table.
+
+  uint32_t addressTableEntries_u32;  // The number of entries in the
+                                     // export address table.
+  uint32_t numberOfNamePointers_u32;
+  uint32_t
+      exportAddressTableRVA_u32;  // The address of the export address table,
+  uint32_t namePointerRVA_u32;
+  uint32_t ordinalTableRVA_u32;
+  //  export_address_name_t *exportAddr_name_t;
+};
+
+/**
+ * @brief holds information for PE file format, carries out PE-format specific
+ * operations, loading, reading displaying header info.
  * @see https://learn.microsoft.com/en-us/windows/win32/debug/pe-format
-*/
+ */
 class PE {
+ public:
+  PE();
+  PE(std::string filename);
+  ~PE();
+  void init(std::string filename);
+  void parse(std::ifstream& in);
+  void readDOSHeader(std::ifstream& in);
+  void readPE(std::ifstream& in);
+  void mapHeaderFlags();
+
+  uint16_t getDosMagic() const;
+  uint16_t getSections() const;
+  uint32_t getElfanew() const;
+  uint32_t getPESignature() const;
+  uint16_t getNumberOfSections() const;
+  uint16_t getMachineType() const;
+  uint16_t getCharacteristics() const;
+  uint16_t getDllCharacterics() const;
+  uint32_t getChecksum() const;
+  uint32_t getBaseOfCode() const;
+  uint32_t getSectionAlignment() const;
+  uint32_t getnumberOfRvaAndSizes() const;
+  uint64_t getImageBase() const;
+  PESection getSection(uint16_t sec) const;
+
  private:
   // DOS header
   uint16_t dosMagic_u16;    // Magic DOS signature MZ
@@ -93,6 +230,9 @@ class PE {
   uint32_t loaderFlags_u32;
   uint32_t numberOfRvaAndSizes_u32;
 
+  DataDirectory* dataDir;
+  PESection* sections;
+
   // mapping flag types and strings
   std::map<uint32_t, std::string> mapSectionFlags;
   std::map<uint16_t, std::string> mapPEFlagTypes;
@@ -111,153 +251,7 @@ class PE {
   //    tls table
   //    load config table
   //    delay import descriptor
- ///////////////
-  /**
-   * @brief holds information for Data directories in a PE file format
-   *  such as Import table, export table, IAT table...etc.
-   * 
-  */
-  class DataDir {
-   private:
-    // Data Directory
-    uint64_t offset;
-    uint32_t virtualAddr;
-    uint32_t size;
-
-   public:
-    DataDir() {}
-    ~DataDir() {}
-
-    void setOffset(uint32_t offset) { this->offset = offset; }
-    void setVirtualAddress(uint32_t va) { this->virtualAddr = va; }
-    void setSize(uint32_t sz) { this->size = sz; }
-
-    auto getOffset() const { return this->offset; }
-    auto getVA() const { return this->virtualAddr; }
-    auto getSize() const { return this->size; }
-  };
-
-  /**
-   * @brief holds information for PE sections in a PE file format
-   *  such as .text, .data, .rdata and so on.
-   * 
-  */
-  class Section {
-   private:
-    // section table
-    std::string name;
-    uint32_t virtualSize_u32;
-    uint32_t virtualAddr_u32;
-    uint32_t sizeOfRawData_u32;
-    uint32_t pointerToRawData_u32;
-    uint32_t pointerToRelocations_u32;
-    uint32_t pointerToLinenumbers_u32;
-    uint16_t numberOfRelocations_u16;
-    uint16_t numberOfLineNumbers_u16;
-    uint32_t characteristics_u32;
-
-   public:
-    Section() {}
-    ~Section() {}
-
-    void setName(std::ifstream& in) {
-      for (int idx = 0; idx < 8; idx++)
-        name.insert(idx, 1, in.get());
-    }
-    void setVirtualSize(uint32_t vsz) { this->virtualSize_u32 = vsz; }
-    void setVirtualAddress(uint32_t va) { this->virtualAddr_u32 = va; }
-    void setRawDataSize(uint32_t sz) { this->sizeOfRawData_u32 = sz; }
-    void setRawDataPointer(uint32_t ptr) { this->pointerToRawData_u32 = ptr; }
-    void setPointerToRelocations(uint32_t ptr) {
-      this->pointerToRelocations_u32 = ptr;
-    }
-    void setPointerToLinenumbers(uint32_t ptr) {
-      this->pointerToLinenumbers_u32 = ptr;
-    }
-    void setNumberOfRelocations(uint16_t n) {
-      this->numberOfRelocations_u16 = n;
-    }
-    void setNumberOfLineNumbers(uint16_t n) {
-      this->numberOfLineNumbers_u16 = n;
-    }
-    void setCharacteristics(uint32_t ch) { this->characteristics_u32 = ch; }
-
-    std::string getName() { return this->name; }
-    auto getVirtualSize() const { return virtualSize_u32; }
-    auto getVirtualAddress() const { return virtualAddr_u32; }
-    auto getCharacteristics() const { return characteristics_u32; }
-  };
-  // Import Table
-  // class ImportDirectory {
-  //   uint32_t importLookupTableRVA_u32; // RVA of the import lookup table
-  //   uint32_t timeStamp_u32;
-  //   uint32_t forwarderChain_u32;
-  //   uint32_t nameRVA_u32;           // address of an ASCII string name of the DLL
-  //   uint32_t importAddressRVA_u32;
-  // };
-
-  // export table
-  // class ExportDirectory {
-  //   uint32_t    exportFlags_u32; // Reserved.
-  //   uint32_t    timeStamp_u32;  // time/date that the export data was created
-  //   uint16_t    majorVersion_u16;
-  //   uint16_t    minorVersion_u16;
-  //   uint32_t    nameRVA_u32;     // Address of ASCII string to name of the DLL
-  //   uint32_t    ordinalBase_u32;  // The starting ordinal number for exports in
-                                    // this image. This field specifies the
-                                    // starting ordinal number for the export
-                                    // address table.
-
-  //   uint32_t    addressTableEntries_u32; // The number of entries in the
-                                            // export address table.
-  //   uint32_t    numberOfNamePointers_u32;
-  //   uint32_t    exportAddressTableRVA_u32; // The address of the export address table,
-  //   uint32_t    namePointerRVA_u32;
-  //   uint32_t    ordinalTableRVA_u32;
-  //   export_address_name_t *exportAddr_name_t;
-  // };
-
-  // misc functions to help with the general parsing operations
-  // uint64_t  rva_to_offset(int numberOfSections, uint64_t rva,
-  //                         section_table_t *sections);
-
-  DataDir *dataDir;
-  Section *sections;
- public:
- 
-  ////////////////* functions  *///////////////////
-  void parse(std::ifstream& in);
-  void readDOSHeader(std::ifstream& in);
-  void readPE(std::ifstream& in);
-  void readDatadir(std::ifstream& in, DataDir dataDir[]);
-  void readSections(std::ifstream& in, Section sections[]);
-  void mapHeaderFlags();
-
-  auto getDosMagic() const { return this->dosMagic_u16; }
-  auto getSections() const { return this->numberOfSections_u16; }
-  auto getElfanew() const { return this->e_lfanew_u32; }
-  auto getPESignature() const { return this->peSignature_u32; }
-  auto getNumberOfSections() const { return this->numberOfSections_u16; }
-  auto getMachineType() const { return this->machine_u16; }
-  auto getCharacteristics() const { return this->characteristics_u16; }
-
-  auto getDllCharacterics() const { return this->dllCharacteristics_u16; }
-
-  auto getChecksum() const { return this->checkSum_u32; }
-  auto getBaseOfCode() const { return this->baseOfCode_u32; }
-  auto getSectionAlignment() const { return this->sectionAlignment_u32; }
-  auto getnumberOfRvaAndSizes() const { return this->numberOfRvaAndSizes_u32; }
-  auto getImageBase() const { return this->imageBase_u64; }
-  auto getSection(uint16_t sec) { return this->sections[sec]; }
-
-  PE() {}
-  PE(std::string filename) { init(filename); }
-
-  void init(std::string filename) {
-    std::ifstream in(filename, std::ios::binary);
-    parse(in);
-  }
-  ~PE();
+  ///////////////
 };
 
 #endif

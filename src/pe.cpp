@@ -1,4 +1,4 @@
-/** 
+/**
  * @file pe.cpp
  * @brief  Implements functions that deals with PE structures
  *        read and save information in a PE class object members.
@@ -6,28 +6,42 @@
  *  https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
-*/
+ */
 #include "headers.h"
 
+PE::PE() {}
+PE::~PE() {
+  delete[] dataDir;
+  delete[] sections;
+}
+PE::PE(std::string filename) {
+  init(filename);
+}
+
+void PE::init(std::string filename) {
+  std::ifstream in(filename, std::ios::binary);
+  parse(in);
+}
+
 /**
- * @brief Given an open file in ifstream, it parses PE header, data directories, and sections.
- * then prints out basic info parsed.
- * 
- * @param in An std::ifstream object with PE file already opened, 
+ * @brief Given an open file in ifstream, it parses PE header, data directories,
+ * and sections. then prints out basic info parsed.
+ *
+ * @param in An std::ifstream object with PE file already opened,
  * assumption here is that the stream object is at offset 0.
- * 
+ *
  * @return none.
-*/
+ */
 void PE::parse(std::ifstream& in) {
   // parsing process in steps
   readDOSHeader(in);
   readPE(in);
-  
-  dataDir = new DataDir[numberOfRvaAndSizes_u32];
-  readDatadir(in, dataDir);
 
-  sections = new Section[numberOfSections_u16];
-  readSections(in, sections);
+  dataDir = new DataDirectory[numberOfRvaAndSizes_u32];
+  dataDir->readDataDirectory(in, dataDir, numberOfRvaAndSizes_u32);
+
+  sections = new PESection[numberOfSections_u16];
+  sections->readSections(in, sections, numberOfSections_u16);
 
   // print PE info
   using namespace std;
@@ -41,29 +55,28 @@ void PE::parse(std::ifstream& in) {
   // print characteristics
   cout << "Characteristics: 0x" << hex << getCharacteristics() << endl << endl;
   // print sections information
-  for (int idx = 0; idx < numberOfSections_u16; idx++){
+  for (int idx = 0; idx < numberOfSections_u16; idx++) {
     cout << "  Name: " << sections[idx].getName() << endl;
-    cout << "  Virtual size: 0x" << hex << sections[idx].getVirtualSize() << endl;
-    cout << "  Virtual Address: 0x" << hex << sections[idx].getVirtualAddress() << endl;
+    cout << "  Virtual size: 0x" << hex << sections[idx].getVirtualSize()
+         << endl;
+    cout << "  Virtual Address: 0x" << hex << sections[idx].getVirtualAddress()
+         << endl;
 
-    cout << "  Characteristics: 0x" << hex << sections[idx].getCharacteristics() << endl;
+    cout << "  Characteristics: 0x" << hex << sections[idx].getCharacteristics()
+         << endl;
     cout << endl;
   }
   // mapHeaderFlags();
 }
-PE::~PE() {
-    delete[] dataDir;
-    delete[] sections;
-}
 
 /**
  * @brief Parses Dos header into members of PE class object.
- * 
- * @param in An std::ifstream object with PE file already opened, 
+ *
+ * @param in An std::ifstream object with PE file already opened,
  * assumption here is that the stream object is at offset 0.
- * 
+ *
  * @return none.
-*/
+ */
 void PE::readDOSHeader(std::ifstream& in) {
   // Reading DOS Header
   dosMagic_u16 = read_u16(in, true);
@@ -90,97 +103,13 @@ void PE::readDOSHeader(std::ifstream& in) {
 }
 
 /**
- * @brief Reads 8 bits and returns them.
- * 
- * @param in An std::ifstream object with PE file already opened.
-  * 
- * @return an 8 bit unsigned integer.
-*/
-uint8_t read_u8(std::ifstream& in) {
-  uint8_t value = 0;
-  unsigned char ch[1] = {0};
-
-  in.read(reinterpret_cast<char*>(ch), 1);
-  value = ch[0];
-
-  return value;
-}
-
-/**
- * @brief Reads 16 bits and returns them in little endian byte order.
- * 
- * @param in An std::ifstream object with PE file already opened, 
-  * 
- * @return a 16 bit unsigned integer.
-*/
-uint16_t read_u16(std::ifstream& in, bool littleEnd) {
-  uint16_t value = 0;
-  unsigned char ch[3] = {0};
-
-
-  in.read(reinterpret_cast<char*>(ch), 2);
-  if (littleEnd) {
-  value |= uint16_t(ch[0]);
-  value |= uint16_t( ch[1]) << 8;
-  }
-  return value;
-}
-
-/**
- * @brief Reads 32 bits and returns them in little endian byte order.
- * 
- * @param in An std::ifstream object with PE file already opened, 
-  * 
- * @return a 32 bit unsigned integer.
-*/
-uint32_t read_u32(std::ifstream& in, bool littleEnd) {
-  uint32_t value = 0;
-  unsigned char ch[4] = {0};
-
-  in.read(reinterpret_cast<char*>(ch), 4);
-  if (littleEnd) {
-  value |=  ch[0];
-  value |= uint32_t(ch[1]) << 8;
-  value |= uint32_t(ch[2]) << 16;
-  value |= uint32_t(ch[3]) << 24;
-  }
-  return value;
-}
-
-/**
- * @brief Reads 64 bits and returns them in little endian byte order.
- * 
- * @param in An std::ifstream object with PE file already opened, 
-  * 
- * @return a 64 bit unsigned integer.
-*/
-uint64_t read_u64(std::ifstream& in, bool littleEnd) {
-  uint64_t value = 0;
-  unsigned char ch[9] = {0};
-
-  in.read(reinterpret_cast<char*>(ch), 8);
-  if (littleEnd) {  
-  value |= uint64_t(ch[0]);
-  value |= uint64_t(ch[1]) << 8;
-  value |= uint64_t(ch[2]) << 16;
-  value |= uint64_t(ch[3]) << 24;
-  value |= uint64_t(ch[4]) << 32;
-  value |= uint64_t(ch[5]) << 40;
-  value |= uint64_t(ch[6]) << 48;
-  value |= uint64_t(ch[7]) << 56;
-  }
-  return value;
-}
-
-
-/**
  * @brief Parses PE header into members of PE class object.
- * 
- * @param in An std::ifstream object with PE file already opened, 
+ *
+ * @param in An std::ifstream object with PE file already opened,
  * e_lfanew needs to have been read correctly for this function to work.
- * 
+ *
  * @return none.
-*/
+ */
 void PE::readPE(std::ifstream& in) {
   in.seekg(e_lfanew_u32, std::ios_base::beg);
 
@@ -244,17 +173,20 @@ void PE::readPE(std::ifstream& in) {
 
 /**
  * @brief Parses PE sections into members of PE class object.
- * 
- * @param in An std::ifstream object with PE file already opened, 
- * this functions assumes file stream is the proper 
+ *
+ * @param in An std::ifstream object with PE file already opened,
+ * this functions assumes file stream is the proper
  * offset before this function is called.
- * @param sections an array of sections that has been already allocated 
+ * @param sections an array of sections that has been already allocated
  *  based on info read from PE header previously.
- * 
+ *
  * @return none.
-*/
-void PE::readSections(std::ifstream& in, Section sections[]) {  
-  for (int idx = 0; idx < numberOfSections_u16; idx++) {
+ */
+void PESection::readSections(std::ifstream& in,
+                             PESection sections[],
+                             uint32_t number) {
+  numberOfSections_u32 = number;
+  for (uint32_t idx = 0; idx < numberOfSections_u32; idx++) {
     sections[idx].setName(in);
     sections[idx].setVirtualSize(read_u32(in, true));
     sections[idx].setVirtualAddress(read_u32(in, true));
@@ -270,18 +202,21 @@ void PE::readSections(std::ifstream& in, Section sections[]) {
 
 /**
  * @brief Parses PE data directories into members of PE class object.
- * 
- * @param in An std::ifstream object with PE file already opened, 
- * this functions assumes file stream is the proper 
+ *
+ * @param in An std::ifstream object with PE file already opened,
+ * this functions assumes file stream is the proper
  * offset before this function is called.
- * @param dataDirectory an array of directories that has been 
+ * @param dataDirectory an array of directories that has been
  * already allocated based on info read from PE header previously.
- * 
+ *
  * @return none.
-*/
-void PE::readDatadir(std::ifstream& in, DataDir dataDirectory[]) {
+ */
+void DataDirectory::readDataDirectory(std::ifstream& in,
+                                      DataDirectory dataDirectory[],
+                                      uint32_t number) {
   // Reading Data Directories
-  for (uint32_t idx = 0; idx < numberOfRvaAndSizes_u32; idx++) {
+  numberOfRva_u32 = number;
+  for (uint32_t idx = 0; idx < numberOfRva_u32; idx++) {
     dataDirectory[idx].setVirtualAddress(read_u32(in, true));
     dataDirectory[idx].setSize(read_u32(in, true));
     // setting directory offset is possible after sections info is read.
@@ -290,9 +225,9 @@ void PE::readDatadir(std::ifstream& in, DataDir dataDirectory[]) {
 
 /**
  * @brief Maps PE flag and property values into map object.
- * 
+ *
  * @return none.
-*/
+ */
 void PE::mapHeaderFlags() {
   using namespace std;
   mapSectionFlags.insert(
@@ -459,4 +394,67 @@ void PE::mapHeaderFlags() {
   mapImageSubsystem.insert(pair<uint8_t, string>(14, "IMAGE_SUBSYSTEM_XBOX"));
   mapImageSubsystem.insert(
       pair<uint8_t, string>(16, "IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION"));
+}
+
+uint16_t PE::getDosMagic() const {
+  return this->dosMagic_u16;
+}
+uint16_t PE::getSections() const {
+  return this->numberOfSections_u16;
+}
+uint32_t PE::getElfanew() const {
+  return this->e_lfanew_u32;
+}
+uint32_t PE::getPESignature() const {
+  return this->peSignature_u32;
+}
+uint16_t PE::getNumberOfSections() const {
+  return this->numberOfSections_u16;
+}
+uint16_t PE::getMachineType() const {
+  return this->machine_u16;
+}
+uint16_t PE::getCharacteristics() const {
+  return this->characteristics_u16;
+}
+uint16_t PE::getDllCharacterics() const {
+  return this->dllCharacteristics_u16;
+}
+uint32_t PE::getChecksum() const {
+  return this->checkSum_u32;
+}
+uint32_t PE::getBaseOfCode() const {
+  return this->baseOfCode_u32;
+}
+uint32_t PE::getSectionAlignment() const {
+  return this->sectionAlignment_u32;
+}
+uint32_t PE::getnumberOfRvaAndSizes() const {
+  return this->numberOfRvaAndSizes_u32;
+}
+uint64_t PE::getImageBase() const {
+  return this->imageBase_u64;
+}
+PESection PE::getSection(uint16_t sec) const {
+  return this->sections[sec];
+}
+
+void DataDirectory::setOffset(uint32_t offset) {
+  this->offset = offset;
+}
+void DataDirectory::setVirtualAddress(uint32_t va) {
+  this->virtualAddr = va;
+}
+void DataDirectory::setSize(uint32_t sz) {
+  this->size = sz;
+}
+
+auto DataDirectory::getOffset() const {
+  return this->offset;
+}
+auto DataDirectory::getVA() const {
+  return this->virtualAddr;
+}
+auto DataDirectory::getSize() const {
+  return this->size;
 }

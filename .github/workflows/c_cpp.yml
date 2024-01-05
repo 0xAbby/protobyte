@@ -29,5 +29,5 @@ jobs:
       run: bash ./setup.sh
 
     - name: run unittest
-      working-directory: ./unit_test/
+      working-directory: ./src/unit_test/
       run: ./runTests

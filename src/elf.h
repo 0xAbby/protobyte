@@ -1,27 +1,34 @@
-/** 
+/**
  * @file elf.h
  * @brief  Definitions and declarations for ELF module
  *
  *  https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
-*/
+ */
 #ifndef ELF_H
 #define ELF_H
 
-#pragma once
 #include "headers.h"
 
-uint8_t read8_le(std::ifstream& in);
-uint16_t read16_le(std::ifstream& in);
-uint32_t read32_le(std::ifstream& in);
-uint64_t read64_le(std::ifstream& in);
-
-uint16_t read16_be(std::ifstream& in);
-uint32_t read32_be(std::ifstream& in);
-uint64_t read64_be(std::ifstream& in);
-
 class ELF {
+ public:
+  ELF();
+  ELF(std::string filename);
+  ~ELF();
+
+  void parse64(std::ifstream& file, bool littleEndian);
+  void parse32(std::ifstream& file, bool littleEndian);
+  void readE_ident(std::ifstream& file);
+  void init(std::string filename);
+  void mapFlags();
+
+  unsigned char* getE_ident();
+  uint16_t getE_type();
+  uint16_t getE_machine();
+  uint64_t getE_phoff();
+  uint64_t getE_entry();
+
  private:
   // Elf64_Ehdr
   unsigned char e_ident[16];
@@ -61,36 +68,12 @@ class ELF {
   uint64_t sh_addralign_u64;
   uint64_t sh_entsize_u64;
 
- public:
-  void parse64(std::ifstream& file, bool littleEndian);
-  void parse32(std::ifstream& file, bool littleEndian);
-  void readE_ident(std::ifstream& file);
-  
-  ELF() {}
-  ELF(std::string filename) { init(filename); }
 
-  void init(std::string filename) {
-    std::ifstream file(filename, std::ios::binary);
-    file.get(reinterpret_cast<char*> (e_ident), 16);
-    
-    if (e_ident[4] & 1) {
-        parse32(file, e_ident[5] & 1);
-        std::cout << " 32 bit" << std::endl;
-    } 
-    else if (e_ident[4] & 2) {
-        // e_ident's 6th byte indicates 1: LSB / 2: MSB
-        parse64(file, e_ident[5] & 1);
-        //std::cout << "64 bit" << std::endl;
-    }    
-  }
-
-  auto getE_ident() { return this->e_ident; }
-  auto getE_type() { return this->e_type_u16; }
-  auto getE_machine() { return this->e_machine_u16; }
-  auto getE_phoff() { return this->e_phoff_u64; }
-  auto getE_entry() { return this->e_entry_u64; }
-  
-
+  std::map<uint32_t, std::string> etypeFlags;
+  std::map<uint32_t, std::string> emachineFlags;
+  std::map<uint32_t, std::string> eclassFlags;
+  std::map<uint32_t, std::string> edataFlags;
+  std::map<uint32_t, std::string> eiosabiFlags;
 };
 
 /*
