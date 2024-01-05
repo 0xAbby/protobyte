@@ -1,12 +1,11 @@
-//
-// main.cpp:
-//  binlyzer, a program for reading an executable's header info.
-//
-//  https://github.com/0xAbby/binlyzer
-//
-// Author:
-//  Abdullah Ada 
-//
+/** 
+ * @file main.cpp
+ * @brief  binlyzer, a program for reading an executable's header info.
+ *
+ *  https://github.com/0xAbby/binlyzer
+ *
+ * @author Abdullah Ada
+*/
 #include "headers.h" 
 
 int main(int argc, char *argv[]) {

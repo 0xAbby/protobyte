@@ -1,11 +1,12 @@
-// pe.h
-//    Definitions and declarations for PE module
-//
-//  https://github.com/0xAbby/binlyzer
-//
-// Author:
-//  Abdullah Ada (0xabby)
-//
+/** 
+ * @file pe.h
+ * @brief  Definitions and declarations for PE module.
+ *           
+ *
+ *  https://github.com/0xAbby/binlyzer
+ *
+ * @author Abdullah Ada
+*/
 #ifndef PE_H
 #define PE_H
 
@@ -15,15 +16,17 @@
 #define OPTIONAL_IMAGE_PE32 0x10b
 #define OPTIONAL_IMAGE_PE32_plus 0x20b
 
-uint8_t read8_le(std::ifstream& in);
-uint16_t read16_le(std::ifstream& in);
-uint32_t read32_le(std::ifstream& in);
-uint64_t read64_le(std::ifstream& in);
+uint8_t read_u8(std::ifstream& in);
+uint16_t read_u16(std::ifstream& in, bool littleEnd);
+uint32_t read_u32(std::ifstream& in, bool littleEnd);
+uint64_t read_u64(std::ifstream& in, bool littleEnd);
 
-uint64_t read_le(std::ifstream& in, int count);
 
-uint32_t read32_be(std::ifstream& in);
-
+/**
+ * @brief holds information for PE file format, carries out PE-format specific operations, loading, reading
+ * displaying header info.
+ * @see https://learn.microsoft.com/en-us/windows/win32/debug/pe-format
+*/
 class PE {
  private:
   // DOS header
@@ -109,6 +112,11 @@ class PE {
   //    load config table
   //    delay import descriptor
  ///////////////
+  /**
+   * @brief holds information for Data directories in a PE file format
+   *  such as Import table, export table, IAT table...etc.
+   * 
+  */
   class DataDir {
    private:
     // Data Directory
@@ -129,6 +137,11 @@ class PE {
     auto getSize() const { return this->size; }
   };
 
+  /**
+   * @brief holds information for PE sections in a PE file format
+   *  such as .text, .data, .rdata and so on.
+   * 
+  */
   class Section {
    private:
     // section table

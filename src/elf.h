@@ -1,14 +1,15 @@
-// elf.h
-//    Definitions and declarations for PE module
-//
-//  https://github.com/0xAbby/binlyzer
-//
-// Author:
-//  Abdullah Ada (0xabby)
-//
+/** 
+ * @file elf.h
+ * @brief  Definitions and declarations for ELF module
+ *
+ *  https://github.com/0xAbby/binlyzer
+ *
+ * @author Abdullah Ada
+*/
 #ifndef ELF_H
 #define ELF_H
 
+#pragma once
 #include "headers.h"
 
 uint8_t read8_le(std::ifstream& in);
@@ -16,7 +17,11 @@ uint16_t read16_le(std::ifstream& in);
 uint32_t read32_le(std::ifstream& in);
 uint64_t read64_le(std::ifstream& in);
 
-class ELF: public PE {
+uint16_t read16_be(std::ifstream& in);
+uint32_t read32_be(std::ifstream& in);
+uint64_t read64_be(std::ifstream& in);
+
+class ELF {
  private:
   // Elf64_Ehdr
   unsigned char e_ident[16];
@@ -57,21 +62,25 @@ class ELF: public PE {
   uint64_t sh_entsize_u64;
 
  public:
-  void parse64(std::ifstream& file, int endian);
-  void parse32(std::ifstream& file, int endian);
+  void parse64(std::ifstream& file, bool littleEndian);
+  void parse32(std::ifstream& file, bool littleEndian);
+  void readE_ident(std::ifstream& file);
   
   ELF() {}
   ELF(std::string filename) { init(filename); }
 
   void init(std::string filename) {
     std::ifstream file(filename, std::ios::binary);
-    file.read(reinterpret_cast<char*> (e_ident), 16);
-
+    file.get(reinterpret_cast<char*> (e_ident), 16);
+    
     if (e_ident[4] & 1) {
-        //parse32(file, e_ident[5]);
+        parse32(file, e_ident[5] & 1);
+        std::cout << " 32 bit" << std::endl;
     } 
     else if (e_ident[4] & 2) {
-        //parse64(file, e_ident[5]);
+        // e_ident's 6th byte indicates 1: LSB / 2: MSB
+        parse64(file, e_ident[5] & 1);
+        //std::cout << "64 bit" << std::endl;
     }    
   }
 
@@ -80,6 +89,7 @@ class ELF: public PE {
   auto getE_machine() { return this->e_machine_u16; }
   auto getE_phoff() { return this->e_phoff_u64; }
   auto getE_entry() { return this->e_entry_u64; }
+  
 
 };
 

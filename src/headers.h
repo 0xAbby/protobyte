@@ -1,12 +1,10 @@
-//
-// headers.h
-//
-//
-//  https://github.com/0xAbby/binlyzer
-//
-// Author:
-//  Abdullah Ada
-//
+/** 
+ * @file headers.h
+ *
+ *  https://github.com/0xAbby/binlyzer
+ *
+ * @author Abdullah Ada
+*/
 #ifndef HEADERS_H
 #define HEADERS_H
  
