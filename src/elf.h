@@ -11,27 +11,55 @@
 
 #include "headers.h"
 
+
+/**
+ * @brief ELF class handles parsing specific ELF format.
+ */
 class ELF {
  public:
-  ELF();
-  ELF(std::string filename);
-  ~ELF();
+  // disabling move/copy constructors
+  ELF(ELF&) = delete;
+  ELF(ELF&& other) = delete;
+  ELF & operator=( ELF&) = delete;
 
+  ELF();
+  ~ELF();
+  ELF(std::string filename);
+  
+  virtual void init(std::string filename);
+  
   void parse64(std::ifstream& file, bool littleEndian);
   void parse32(std::ifstream& file, bool littleEndian);
   void readE_ident(std::ifstream& file);
-  void init(std::string filename);
   void mapFlags();
 
   unsigned char* getE_ident();
-  uint16_t getE_type();
-  uint16_t getE_machine();
-  uint64_t getE_phoff();
-  uint64_t getE_entry();
+  uint16_t getE_type() const;
+  uint16_t getE_machine() const;
+  uint64_t getE_phoff() const;
+  uint64_t getE_entry() const;
+  uint32_t getMagicBytes() const;
+  uint16_t getEi_class() const;
+  uint16_t getEi_data() const;
+  uint16_t getEi_osabi() const;
+
+  std::map<uint16_t, std::string> getEtypeFlags() const;
+  std::map<uint16_t, std::string> getEmachineFlags() const;
+  std::map<uint16_t, std::string> getEclassFlags() const;
+  std::map<uint16_t, std::string> getEdataFlags() const;
+  std::map<uint16_t, std::string> getEiosabiFlags() const;
+
+  std::map<uint16_t, std::string> getMapFlag(uint8_t) const;
 
  private:
-  // Elf64_Ehdr
+  // Elfxx_Ehdr
+  uint32_t magicBytes_u32;
   unsigned char e_ident[16];
+  uint8_t ei_class_u8;
+  uint8_t ei_data_u8;
+  u_int8_t ei_version_u8;
+  uint8_t ei_osabi_u8;
+
   uint16_t e_type_u16;
   uint16_t e_machine_u16;
   uint32_t e_version_u32;
@@ -46,7 +74,7 @@ class ELF {
   uint16_t e_shnum_u16;
   uint16_t e_shstrndx_u16;
 
-  // Elf64_Phdr
+  // Elfxx_Phdr
   uint32_t p_type_u32;
   uint32_t p_flags_u32;
   uint64_t p_offset_u64;
@@ -56,7 +84,7 @@ class ELF {
   uint64_t p_memsz_u64;
   uint64_t p_align_u64;
 
-  // Elf64_Shdr
+  // Elfxx_Shdr
   uint32_t sh_name_u32;
   uint32_t sh_type_u32;
   uint64_t sh_flags_u64;
@@ -68,12 +96,12 @@ class ELF {
   uint64_t sh_addralign_u64;
   uint64_t sh_entsize_u64;
 
-
-  std::map<uint32_t, std::string> etypeFlags;
-  std::map<uint32_t, std::string> emachineFlags;
-  std::map<uint32_t, std::string> eclassFlags;
-  std::map<uint32_t, std::string> edataFlags;
-  std::map<uint32_t, std::string> eiosabiFlags;
+  
+  std::map<uint16_t, std::string> etypeFlags;    // map 0
+  std::map<uint16_t, std::string> emachineFlags; // map 1
+  std::map<uint16_t, std::string> eclassFlags;   // map 2
+  std::map<uint16_t, std::string> edataFlags;    // map 3
+  std::map<uint16_t, std::string> eiosabiFlags;  // map 4
 };
 
 /*

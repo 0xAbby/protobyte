@@ -9,10 +9,16 @@
 #include "headers.h"
 
 int main(int argc, char* argv[]) {
-  if (argc < 2) {
-    printf("please supply at least One valid PE file\n");
-    exit(1);
+  try {
+    if (argc < 2) {
+      printf("please supply at least One valid PE file\n");
+      exit(1);
+    }
+    FileIO file(argv[1]);
   }
-  FileIO fileObj(argv[1]);
+  catch (std::exception& e)
+  {
+    std::cerr << "Exception: " << e.what() << "\n"; // exepction.. 
+  }
   return 0;
 }

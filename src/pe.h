@@ -1,7 +1,7 @@
 /**
  * @file pe.h
- * @brief  Definitions and declarations for PE module.
- *
+ * @brief  Definitions and declarations for PE module, Dos header, PE header,
+ * sections, and directories.
  *
  *  https://github.com/0xAbby/binlyzer
  *
@@ -19,23 +19,19 @@
 /**
  * @brief holds information for Data directories in a PE file format
  *  such as Import table, export table, IAT table...etc.
- *
  */
 class DataDirectory {
  public:
   DataDirectory() {}
   ~DataDirectory() {}
 
-  void setOffset(uint32_t offset);
-  void setVirtualAddress(uint32_t va);
-  void setSize(uint32_t sz);
-  void readDataDirectory(std::ifstream& in,
-                         DataDirectory dataDir[],
-                         uint32_t number);
+  void setOffset(uint32_t);
+  void setVirtualAddress(uint32_t);
+  void setSize(uint32_t);
 
-  auto getOffset() const;
-  auto getVA() const;
-  auto getSize() const;
+  uint64_t getOffset() const;
+  uint32_t getVA() const;
+  uint32_t getSize() const;
 
  private:
   // Data Directory
@@ -48,14 +44,11 @@ class DataDirectory {
 /**
  * @brief holds information for PE sections in a PE file format
  *  such as .text, .data, .rdata and so on.
- *
  */
 class PESection {
  public:
   PESection() {}
   ~PESection() {}
-
-  void readSections(std::ifstream& in, PESection sections[], uint32_t number);
 
   void setName(std::ifstream& in) {
     for (int idx = 0; idx < 8; idx++)
@@ -75,10 +68,10 @@ class PESection {
   void setNumberOfLineNumbers(uint16_t n) { this->numberOfLineNumbers_u16 = n; }
   void setCharacteristics(uint32_t ch) { this->characteristics_u32 = ch; }
 
-  std::string getName() { return this->name; }
-  auto getVirtualSize() const { return virtualSize_u32; }
-  auto getVirtualAddress() const { return virtualAddr_u32; }
-  auto getCharacteristics() const { return characteristics_u32; }
+  std::string getName() const { return this->name; }
+  uint32_t getVirtualSize() const { return virtualSize_u32; }
+  uint32_t getVirtualAddress() const { return virtualAddr_u32; }
+  uint32_t getCharacteristics() const { return characteristics_u32; }
 
  private:
   // section table
@@ -127,11 +120,11 @@ class ExportDirectory {
   uint32_t addressTableEntries_u32;  // The number of entries in the
                                      // export address table.
   uint32_t numberOfNamePointers_u32;
-  uint32_t
-      exportAddressTableRVA_u32;  // The address of the export address table,
+  uint32_t exportAddressTableRVA_u32;
   uint32_t namePointerRVA_u32;
   uint32_t ordinalTableRVA_u32;
-  //  export_address_name_t *exportAddr_name_t;
+
+  // std::vector<exportAddressName> exportAddress;
 };
 
 /**
@@ -142,12 +135,20 @@ class ExportDirectory {
 class PE {
  public:
   PE();
-  PE(std::string filename);
   ~PE();
-  void init(std::string filename);
-  void parse(std::ifstream& in);
-  void readDOSHeader(std::ifstream& in);
-  void readPE(std::ifstream& in);
+  PE(std::string);
+
+  // disabling move/copy constructors
+  PE(PE&) = delete;
+  PE(PE&& other) = delete;
+  PE& operator=(PE&) = delete;
+
+  virtual void init(std::string);
+  void parse(std::ifstream&);
+  void readDOSHeader(std::ifstream&);
+  void readPE(std::ifstream&);
+  void readDataDirectory(std::ifstream&, std::vector<DataDirectory>&);
+  void readSections(std::ifstream&, std::vector<PESection>&);
   void mapHeaderFlags();
 
   uint16_t getDosMagic() const;
@@ -163,7 +164,8 @@ class PE {
   uint32_t getSectionAlignment() const;
   uint32_t getnumberOfRvaAndSizes() const;
   uint64_t getImageBase() const;
-  PESection getSection(uint16_t sec) const;
+
+  PESection getSection(uint16_t) const;
 
  private:
   // DOS header
@@ -230,8 +232,17 @@ class PE {
   uint32_t loaderFlags_u32;
   uint32_t numberOfRvaAndSizes_u32;
 
-  DataDirectory* dataDir;
-  PESection* sections;
+  std::vector<DataDirectory> dataDir;
+  std::vector<PESection> sections;
+  std::vector<PESection> section_table;
+  std::vector<PESection> exportDirectory;
+  std::vector<PESection> importDirectory;
+  std::vector<PESection> resourceDirectory;
+  std::vector<PESection> baseRelocationTable;
+  std::vector<PESection> debugTable;
+  std::vector<PESection> tlsTable;
+  std::vector<PESection> loadConfigTable;
+  std::vector<PESection> delayImportDescriptor;
 
   // mapping flag types and strings
   std::map<uint32_t, std::string> mapSectionFlags;
@@ -239,19 +250,6 @@ class PE {
   std::map<uint16_t, std::string> mapImageCharacteristics;
   std::map<uint16_t, std::string> mapMachineType;
   std::map<uint8_t, std::string> mapImageSubsystem;
-
-  // section_table_t    *section_table;
-  // data_directory_t   *dataDirectory;
-  // export_directory_t  exportDir;
-  // import_directory_t  *importDir;
-  // to be implemented:
-  //    resources directory
-  //    base relocation table
-  //    debug table
-  //    tls table
-  //    load config table
-  //    delay import descriptor
-  ///////////////
 };
 
 #endif

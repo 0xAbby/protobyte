@@ -24,6 +24,10 @@ class MachOSection {
   uint32_t numberOfRelocationEntries_u32;
 };
 
+/**
+ * @brief holds information Variable size commands that 
+ * specify the layout and linkage characteristics of of the file.
+ */
 class LoadCommand {
  public:
  private:
@@ -42,17 +46,32 @@ class LoadCommand {
   MachOSection* section;  // an array of section objects.
 };
 
+/**
+ * @brief holds information for Mach_o file format, carries out Mach-O specific
+ * operations, loading, reading displaying header info.
+ * @see https://en.wikipedia.org/wiki/Mach-O
+ * @see https://developer.apple.com/library/archive/documentation/Performance\
+ * /Conceptual/CodeFootprint/Articles/MachOOverview.html
+ * @see https://github.com/aidansteele/osx-abi-macho-file-format-reference
+ */
 class MACHO {
  public:
-  MACHO() {}
-  ~MACHO() {}
-  MACHO(std::string filename);
-  void init(std::string filename);
+ // disabling move/copy constructors
+  MACHO(MACHO&) = delete;
+  MACHO(MACHO&&) = delete;
+  MACHO & operator=( MACHO&) = delete;
+
+  MACHO();
+  virtual ~MACHO();
+  MACHO(std::string);
+
+  void init(std::string);
+  void parse32_macho(std::ifstream&);
 
  private:
   // header
   uint32_t magicBytes_u32;
-  uint32_t cpuType_U32;
+  uint32_t cpuType_u32;
   uint32_t cpuSubtype_u32;
   uint32_t fileType_u32;
   uint32_t numLoadCommands_u32;

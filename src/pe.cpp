@@ -10,14 +10,26 @@
 #include "headers.h"
 
 PE::PE() {}
-PE::~PE() {
-  delete[] dataDir;
-  delete[] sections;
-}
+PE::~PE() {}
+
+/**
+ * @brief constructor for PE class objects that helps with starting parsing operation.
+ *
+ * @param filename a string for a file to be opened and parsed.
+ *
+ * @return none.
+ */
 PE::PE(std::string filename) {
-  init(filename);
+ // init(filename);
 }
 
+/**
+ * @brief Open file in binary mode and calls parsing method.
+ *
+ * @param filename a string for a file to be opened and parsed.
+ *
+ * @return none.
+ */
 void PE::init(std::string filename) {
   std::ifstream in(filename, std::ios::binary);
   parse(in);
@@ -36,37 +48,9 @@ void PE::parse(std::ifstream& in) {
   // parsing process in steps
   readDOSHeader(in);
   readPE(in);
-
-  dataDir = new DataDirectory[numberOfRvaAndSizes_u32];
-  dataDir->readDataDirectory(in, dataDir, numberOfRvaAndSizes_u32);
-
-  sections = new PESection[numberOfSections_u16];
-  sections->readSections(in, sections, numberOfSections_u16);
-
-  // print PE info
-  using namespace std;
-  cout << "Parsed info: \n\n";
-  // print magic bytes
-  cout << "Magic bytes: 0x" << hex << getDosMagic() << endl;
-  // print PE offset
-  cout << "PE offset: 0x" << hex << getElfanew() << endl;
-  // print number of section
-  cout << "Number of sections: " << getNumberOfSections() << endl;
-  // print characteristics
-  cout << "Characteristics: 0x" << hex << getCharacteristics() << endl << endl;
-  // print sections information
-  for (int idx = 0; idx < numberOfSections_u16; idx++) {
-    cout << "  Name: " << sections[idx].getName() << endl;
-    cout << "  Virtual size: 0x" << hex << sections[idx].getVirtualSize()
-         << endl;
-    cout << "  Virtual Address: 0x" << hex << sections[idx].getVirtualAddress()
-         << endl;
-
-    cout << "  Characteristics: 0x" << hex << sections[idx].getCharacteristics()
-         << endl;
-    cout << endl;
-  }
-  // mapHeaderFlags();
+  readDataDirectory(in, dataDir);
+  readSections(in, sections);
+  mapHeaderFlags();
 }
 
 /**
@@ -78,28 +62,29 @@ void PE::parse(std::ifstream& in) {
  * @return none.
  */
 void PE::readDOSHeader(std::ifstream& in) {
+   
   // Reading DOS Header
-  dosMagic_u16 = read_u16(in, true);
-  e_cblp_u16 = read_u16(in, true);
-  e_cp_u16 = read_u16(in, true);
-  e_crlc_u16 = read_u16(in, true);
-  e_cparhdr_u16 = read_u16(in, true);
-  e_minalloc_u16 = read_u16(in, true);
-  e_maxalloc_u16 = read_u16(in, true);
-  e_ss_u16 = read_u16(in, true);
-  e_sp_u16 = read_u16(in, true);
-  e_csum_u16 = read_u16(in, true);
-  e_ip_u16 = read_u16(in, true);
-  e_cs_u16 = read_u16(in, true);
-  e_lfarlc_u16 = read_u16(in, true);
-  e_ovno_u16 = read_u16(in, true);
-  e_res_u64 = read_u64(in, true);
-  e_oemid_u16 = read_u16(in, true);
-  e_oeminfo_u16 = read_u16(in, true);
-  e_res2_u64 = read_u64(in, true);
-  e_res2_u64 = read_u64(in, true);
-  e_res2_u64 = read_u32(in, true);
-  e_lfanew_u32 = read_u32(in, true);
+  dosMagic_u16 = FileIO::FileIO::read_u16(in, true);
+  e_cblp_u16 = FileIO::FileIO::read_u16(in, true);
+  e_cp_u16 = FileIO::read_u16(in, true);
+  e_crlc_u16 = FileIO::read_u16(in, true);
+  e_cparhdr_u16 = FileIO::read_u16(in, true);
+  e_minalloc_u16 = FileIO::read_u16(in, true);
+  e_maxalloc_u16 = FileIO::read_u16(in, true);
+  e_ss_u16 = FileIO::read_u16(in, true);
+  e_sp_u16 = FileIO::read_u16(in, true);
+  e_csum_u16 = FileIO::read_u16(in, true);
+  e_ip_u16 = FileIO::read_u16(in, true);
+  e_cs_u16 = FileIO::read_u16(in, true);
+  e_lfarlc_u16 = FileIO::read_u16(in, true);
+  e_ovno_u16 = FileIO::read_u16(in, true);
+  e_res_u64 = FileIO::read_u64(in, true);
+  e_oemid_u16 = FileIO::read_u16(in, true);
+  e_oeminfo_u16 = FileIO::read_u16(in, true);
+  e_res2_u64 = FileIO::read_u64(in, true);
+  e_res2_u64 = FileIO::read_u64(in, true);
+  e_res2_u64 = FileIO::read_u32(in, true);
+  e_lfanew_u32 = FileIO::read_u32(in, true);
 }
 
 /**
@@ -114,61 +99,61 @@ void PE::readPE(std::ifstream& in) {
   in.seekg(e_lfanew_u32, std::ios_base::beg);
 
   // PE header
-  peSignature_u32 = read_u32(in, true);
-  machine_u16 = read_u16(in, true);
-  numberOfSections_u16 = read_u16(in, true);
-  timeStamp_u32 = read_u32(in, true);
-  symTablePtr_u32 = read_u32(in, true);
-  numberOfSym_u32 = read_u32(in, true);
-  optionalHeaderSize_u16 = read_u16(in, true);
-  characteristics_u16 = read_u16(in, true);
+  peSignature_u32 = FileIO::read_u32(in, true);
+  machine_u16 = FileIO::read_u16(in, true);
+  numberOfSections_u16 = FileIO::read_u16(in, true);
+  timeStamp_u32 = FileIO::read_u32(in, true);
+  symTablePtr_u32 = FileIO::read_u32(in, true);
+  numberOfSym_u32 = FileIO::read_u32(in, true);
+  optionalHeaderSize_u16 = FileIO::read_u16(in, true);
+  characteristics_u16 = FileIO::read_u16(in, true);
 
   // optional header (Standard Fields)
-  optionalHeaderMagic_u16 = read_u16(in, true);
-  majorLinkerVer_u8 = read_u8(in);
-  minorLinkerVer_u8 = read_u8(in);
-  sizeOfCode_u32 = read_u32(in, true);
-  sizeOfInitializedData_u32 = read_u32(in, true);
-  sizeOfUninitializedData_u32 = read_u32(in, true);
-  entryPoint_u32 = read_u32(in, true);
-  baseOfCode_u32 = read_u32(in, true);
+  optionalHeaderMagic_u16 = FileIO::read_u16(in, true);
+  majorLinkerVer_u8 = FileIO::read_u8(in);
+  minorLinkerVer_u8 = FileIO::read_u8(in);
+  sizeOfCode_u32 = FileIO::read_u32(in, true);
+  sizeOfInitializedData_u32 = FileIO::read_u32(in, true);
+  sizeOfUninitializedData_u32 = FileIO::read_u32(in, true);
+  entryPoint_u32 = FileIO::read_u32(in, true);
+  baseOfCode_u32 = FileIO::read_u32(in, true);
 
   if (optionalHeaderMagic_u16 == OPTIONAL_IMAGE_PE32_plus) {
-    imageBase_u64 = read_u64(in, true);
+    imageBase_u64 = FileIO::read_u64(in, true);
     // std::cout << "64bit PE \n";
   } else {
     //  std::cout << "32bit PE\n";
-    baseOfData_u32 = read_u32(in, true);
-    imageBase_u64 = read_u32(in, true);
+    baseOfData_u32 = FileIO::read_u32(in, true);
+    imageBase_u64 = FileIO::read_u32(in, true);
   }
-  sectionAlignment_u32 = read_u32(in, true);
-  fileAlignment_u32 = read_u32(in, true);
-  majorOSVersion_u16 = read_u16(in, true);
-  minorOSVersion_u16 = read_u16(in, true);
-  majorImageVersion_u16 = read_u16(in, true);
-  minorImageVersion_u16 = read_u16(in, true);
-  majorSubsystemVersion_u16 = read_u16(in, true);
-  minorSubsystemVer_u16 = read_u16(in, true);
-  win32VersionVal_u32 = read_u32(in, true);
-  sizeOfImage_u32 = read_u32(in, true);
-  sizeOfHeaders_u32 = read_u32(in, true);
-  checkSum_u32 = read_u32(in, true);
-  subsystem_u16 = read_u16(in, true);
-  dllCharacteristics_u16 = read_u16(in, true);
+  sectionAlignment_u32 = FileIO::read_u32(in, true);
+  fileAlignment_u32 = FileIO::read_u32(in, true);
+  majorOSVersion_u16 = FileIO::read_u16(in, true);
+  minorOSVersion_u16 = FileIO::read_u16(in, true);
+  majorImageVersion_u16 = FileIO::read_u16(in, true);
+  minorImageVersion_u16 = FileIO::read_u16(in, true);
+  majorSubsystemVersion_u16 = FileIO::read_u16(in, true);
+  minorSubsystemVer_u16 = FileIO::read_u16(in, true);
+  win32VersionVal_u32 = FileIO::read_u32(in, true);
+  sizeOfImage_u32 = FileIO::read_u32(in, true);
+  sizeOfHeaders_u32 = FileIO::read_u32(in, true);
+  checkSum_u32 = FileIO::read_u32(in, true);
+  subsystem_u16 = FileIO::read_u16(in, true);
+  dllCharacteristics_u16 = FileIO::read_u16(in, true);
 
   if (optionalHeaderMagic_u16 == OPTIONAL_IMAGE_PE32_plus) {
-    sizeOfStackReserve_u64 = read_u64(in, true);
-    sizeOfStackCommit_u64 = read_u64(in, true);
-    sizeOfHeapReserve_u64 = read_u64(in, true);
-    sizeOfHeapCommit_u64 = read_u64(in, true);
+    sizeOfStackReserve_u64 = FileIO::read_u64(in, true);
+    sizeOfStackCommit_u64 = FileIO::read_u64(in, true);
+    sizeOfHeapReserve_u64 = FileIO::read_u64(in, true);
+    sizeOfHeapCommit_u64 = FileIO::read_u64(in, true);
   } else {
-    sizeOfStackReserve_u64 = read_u32(in, true);
-    sizeOfStackCommit_u64 = read_u32(in, true);
-    sizeOfHeapReserve_u64 = read_u32(in, true);
-    sizeOfHeapCommit_u64 = read_u32(in, true);
+    sizeOfStackReserve_u64 = FileIO::read_u32(in, true);
+    sizeOfStackCommit_u64 = FileIO::read_u32(in, true);
+    sizeOfHeapReserve_u64 = FileIO::read_u32(in, true);
+    sizeOfHeapCommit_u64 = FileIO::read_u32(in, true);
   }
-  loaderFlags_u32 = read_u32(in, true);
-  numberOfRvaAndSizes_u32 = read_u32(in, true);
+  loaderFlags_u32 = FileIO::read_u32(in, true);
+  numberOfRvaAndSizes_u32 = FileIO::read_u32(in, true);
 }
 
 /**
@@ -182,26 +167,25 @@ void PE::readPE(std::ifstream& in) {
  *
  * @return none.
  */
-void PESection::readSections(std::ifstream& in,
-                             PESection sections[],
-                             uint32_t number) {
-  numberOfSections_u32 = number;
-  for (uint32_t idx = 0; idx < numberOfSections_u32; idx++) {
-    sections[idx].setName(in);
-    sections[idx].setVirtualSize(read_u32(in, true));
-    sections[idx].setVirtualAddress(read_u32(in, true));
-    sections[idx].setRawDataSize(read_u32(in, true));
-    sections[idx].setRawDataPointer(read_u32(in, true));
-    sections[idx].setPointerToRelocations(read_u32(in, true));
-    sections[idx].setPointerToLinenumbers(read_u32(in, true));
-    sections[idx].setNumberOfRelocations(read_u16(in, true));
-    sections[idx].setNumberOfLineNumbers(read_u16(in, true));
-    sections[idx].setCharacteristics(read_u32(in, true));
+void PE::readSections(std::ifstream& in, std::vector<PESection>& sections) {
+  for (uint32_t idx = 0; idx < numberOfSections_u16; idx++) {
+    PESection section;
+    section.setName(in);
+    section.setVirtualSize(FileIO::read_u32(in, true));
+    section.setVirtualAddress(FileIO::read_u32(in, true));
+    section.setRawDataSize(FileIO::read_u32(in, true));
+    section.setRawDataPointer(FileIO::read_u32(in, true));
+    section.setPointerToRelocations(FileIO::read_u32(in, true));
+    section.setPointerToLinenumbers(FileIO::read_u32(in, true));
+    section.setNumberOfRelocations(FileIO::read_u16(in, true));
+    section.setNumberOfLineNumbers(FileIO::read_u16(in, true));
+    section.setCharacteristics(FileIO::read_u32(in, true));
+    sections.push_back(section);
   }
 }
 
 /**
- * @brief Parses PE data directories into members of PE class object.
+ * @brief Parses PE data directories into directory of PE class object.
  *
  * @param in An std::ifstream object with PE file already opened,
  * this functions assumes file stream is the proper
@@ -211,14 +195,13 @@ void PESection::readSections(std::ifstream& in,
  *
  * @return none.
  */
-void DataDirectory::readDataDirectory(std::ifstream& in,
-                                      DataDirectory dataDirectory[],
-                                      uint32_t number) {
-  // Reading Data Directories
-  numberOfRva_u32 = number;
-  for (uint32_t idx = 0; idx < numberOfRva_u32; idx++) {
-    dataDirectory[idx].setVirtualAddress(read_u32(in, true));
-    dataDirectory[idx].setSize(read_u32(in, true));
+void PE::readDataDirectory(std::ifstream& in,
+                           std::vector<DataDirectory>& dataDirectory) {
+  for (uint32_t idx = 0; idx < numberOfRvaAndSizes_u32; idx++) {
+    DataDirectory dataDir;
+    dataDir.setVirtualAddress(FileIO::read_u32(in, true));
+    dataDir.setSize(FileIO::read_u32(in, true));
+    dataDirectory.push_back(dataDir);
     // setting directory offset is possible after sections info is read.
   }
 }
@@ -449,12 +432,12 @@ void DataDirectory::setSize(uint32_t sz) {
   this->size = sz;
 }
 
-auto DataDirectory::getOffset() const {
+uint64_t DataDirectory::getOffset() const {
   return this->offset;
 }
-auto DataDirectory::getVA() const {
+uint32_t DataDirectory::getVA() const {
   return this->virtualAddr;
 }
-auto DataDirectory::getSize() const {
+uint32_t DataDirectory::getSize() const {
   return this->size;
 }

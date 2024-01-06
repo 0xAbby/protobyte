@@ -14,6 +14,55 @@ $ make
 $ ./binlyzer /path/to/executable-file
 ```
 
+### Examples
+
+Some examples parsing PE file:
+```
+$ ./binlyzer samples/pe/dbghelp.dll 
+Parsed info: 
+
+Magic bytes: 0x5a4d
+PE offset: 0x110
+Number of sections: 8
+Characteristics: 0x2022
+
+Name: .text
+ Virtual size: 0x1590de
+ Virtual Address: 0x1000
+ Characteristics: 0x60000020
+
+Name: .rdata
+ Virtual size: 0x58fda
+ Virtual Address: 0x15b000
+ Characteristics: 0x40000040
+
+Name: .data
+ Virtual size: 0x1f0bc
+ Virtual Address: 0x1b4000
+ Characteristics: 0xc0000040
+...
+```
+
+Another example parsing an ELF file:
+```
+$ ./binlyzer samples/elf/lshw 
+Magic bytes:    0x7f454c46 | 64bit (ELFCLASS64)
+byte order:     Least Significant Byte (LSB)
+OS ABI:         NONE
+Type:   Dynamic / position independant ET_DYN
+Machine:        64bit (EM_X86_64)
+Entry Point:    0x1c1b0
+
+$ ./binlyzer samples/elf/libstagefright_flacdec.so 
+Magic bytes:    0x7f454c46 | 32bit (ELFCLASS32)
+byte order:     Least Significant Byte (LSB)
+OS ABI:         NONE
+Type:   Dynamic / position independant ET_DYN
+Machine:        ARM (EM_ARM)
+Entry Point:    0x0
+```
+
+
 ### Unit testing (optional)
 
 To help improve code quality, and assist in TDD (test driven development), the program is using GoogleTest Framework, to be able to run the unit test, installing libgtest is required. 

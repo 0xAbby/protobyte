@@ -1,6 +1,6 @@
 /**
  * @file file_io.cpp
- * @brief  functions used for read/write operations on a given file
+ * @brief  Methods used for read/write operations on a given file
  *
  *  https://github.com/0xAbby/binlyzer
  *
@@ -10,34 +10,134 @@
 
 FileIO::FileIO() {}
 FileIO::~FileIO() {}
+
+/**
+ * @brief A method to print out parsed information from a class object.
+ *
+ * @param fileObject A class object that will be either PE, ELF or MACHO, based
+ * on the type the method will continue printing relevant information.
+ *
+ * @return none.
+ */
 FileIO::FileIO(std::string filename) {
   using namespace std;
   ifstream file(filename, ios::binary);
   uint32_t bytes = read_u32(file, true);
-  file.close();
 
   file.seekg(0);
   if (uint16_t(bytes) == 0x5a4d) {
-    // processing PE
-    PE pe(filename);
+    // processing PE and print info
+    PE pe;
+
+    pe.init(filename);
+    printPE(pe);
   } else if (bytes == 0x464c457f) {
     // processing ELF
-    ELF elf(filename);
+    ELF elf;
+
+    elf.init(filename);
+    printELF(elf);
   } else if (bytes == 0xfeedfacf || bytes == 0xfeedface ||
              bytes == 0xcafebabe || bytes == 0xbebafeca) {
     // processing Mach-O
-    MACHO mach_o(filename);
+    std::cout << "Mach-O File" << std::endl;
+    MACHO mach_o;
+
+    mach_o.init(filename);
+    printMachO(mach_o);
   }
 }
 
 /**
- * @brief Reads 8 bits and returns them.
+ * @brief A Method to print out parsed information from a class object.
+ *
+ * @param file A class object that will be either PE, ELF or MACHO, based on the
+ * type the method will continue printing relevant information.
+ *
+ * @return none.
+ */
+template <typename T>
+void FileIO::printPE(T& file) const {
+  using namespace std;
+
+  uint32_t numberOfSections = file.getNumberOfSections();
+  cout << "Parsed info: \n\n";
+
+  // print magic bytes
+  cout << "Magic bytes: 0x" << hex << file.getDosMagic() << endl;
+
+  // print PE offset
+  cout << "PE offset: 0x" << hex << file.getElfanew() << endl;
+
+  // print number of section
+  cout << "Number of sections: " << file.getNumberOfSections() << endl;
+
+  // print characteristics
+  cout << "Characteristics: 0x" << hex << file.getCharacteristics() << endl
+       << endl;
+
+  // print sections information
+  for (uint32_t idx = 0; idx < numberOfSections; idx++) {
+    cout << "Name: " << file.getSection(idx).getName() << endl;
+    cout << " Virtual size: 0x" << hex << file.getSection(idx).getVirtualSize()
+         << endl;
+    cout << " Virtual Address: 0x" << hex
+         << file.getSection(idx).getVirtualAddress() << endl;
+    cout << " Characteristics: 0x" << hex
+         << file.getSection(idx).getCharacteristics();
+    cout << endl << endl;
+  }
+}
+
+/**
+ * @brief A Method to print out parsed information from a class object.
+ *
+ * @param file A class object that will be either PE, ELF or MACHO, based on the
+ * type the method will continue printing relevant information.
+ *
+ * @return none.
+ */
+template <typename T>
+void FileIO::printELF(T& file) const {
+  using namespace std;
+  cout << "Magic bytes: \t0x" << hex << file.getMagicBytes() << " | "
+       << file.getEclassFlags()[file.getEi_class()] << endl;
+  cout << "byte order: \t" << file.getEdataFlags()[file.getEi_data()]
+       << endl;
+  cout << "OS ABI: \t" << file.getEiosabiFlags()[file.getEi_osabi()] << endl;
+  cout << "Type: \t" << file.getEtypeFlags()[file.getE_type()] << endl;
+  cout << "Machine: \t" << file.getEmachineFlags()[file.getE_machine()] << endl;
+  cout << "Entry Point: \t0x" << hex << file.getE_entry() << endl;
+}
+
+template <typename T>
+void FileIO::printMachO(T& file) const {
+  using namespace std;
+  // cout <<  << endl;
+  // x86 mach-o:
+  //  magic bytes
+  //  cpu type
+  //  file type
+  //  number of load commands
+  //  segments1..2..3...
+  //  code directory info
+  //  start of section headers
+
+  // Fat mach-O file
+  //  magic bytes
+  //  fat_arch sections
+  //  mach-o header
+  //  
+}
+
+/**
+ * @brief Reads unsigned 8 bits and returns them.
  *
  * @param in An std::ifstream object with PE file already opened.
  *
  * @return an 8 bit unsigned integer.
  */
-uint8_t read_u8(std::ifstream& in) {
+uint8_t FileIO::read_u8(std::ifstream& in) {
   uint8_t value = 0;
   unsigned char ch[1] = {0};
 
@@ -48,14 +148,14 @@ uint8_t read_u8(std::ifstream& in) {
 }
 
 /**
- * @brief Reads 16 bits and returns them in little endian byte order.
+ * @brief Reads unsigned 16 bits and returns them in little endian byte order.
  *
  * @param in An std::ifstream object with PE file already opened.
  * @param littleEnd Indicates byte order, True: Little end. False: Big end.
  *
  * @return a 16 bit unsigned integer.
  */
-uint16_t read_u16(std::ifstream& in, bool littleEnd) {
+uint16_t FileIO::read_u16(std::ifstream& in, bool littleEnd) {
   uint16_t value = 0;
   unsigned char ch[3] = {0};
 
@@ -71,14 +171,14 @@ uint16_t read_u16(std::ifstream& in, bool littleEnd) {
 }
 
 /**
- * @brief Reads 32 bits and returns them in little endian byte order.
+ * @brief Reads unsigned 32 bits and returns them in little endian byte order.
  *
  * @param in An std::ifstream object with PE file already opened.
  * @param littleEnd Indicates byte order, True: Little end. False: Big end.
  *
  * @return a 32 bit unsigned integer.
  */
-uint32_t read_u32(std::ifstream& in, bool littleEnd) {
+uint32_t FileIO::read_u32(std::ifstream& in, bool littleEnd) {
   uint32_t value = 0;
   unsigned char ch[4] = {0};
 
@@ -98,14 +198,14 @@ uint32_t read_u32(std::ifstream& in, bool littleEnd) {
 }
 
 /**
- * @brief Reads 64 bits and returns them in little endian byte order.
+ * @brief Reads unsigned 64 bits and returns them in little endian byte order.
  *
  * @param in An std::ifstream object with PE file already opened.
  * @param littleEnd Indicates byte order, True: Little end. False: Big end.
  *
  * @return a 64 bit unsigned integer.
  */
-uint64_t read_u64(std::ifstream& in, bool littleEnd) {
+uint64_t FileIO::read_u64(std::ifstream& in, bool littleEnd) {
   uint64_t value = 0;
   unsigned char ch[9] = {0};
 

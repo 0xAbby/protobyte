@@ -13,6 +13,8 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include <typeinfo>
+
 #include <cstdio>
 #include <stdlib.h>
 #include <cstdint>

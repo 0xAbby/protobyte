@@ -22,13 +22,13 @@ class ELFTest : public testing::Test {
 
 // last two bits in the 5th byte of magic bytes indicates whether ELF is 32 / 64
 // bit 2 is for 64bit
-TEST_F(ELFTest, e_ident) {
-  ASSERT_TRUE(elf.getE_ident()[4] & 2);
+TEST_F(ELFTest, MagicBytes) {
+  ASSERT_TRUE(elf.getMagicBytes() == 0x7f454c46);
 }
 
 // e_ident 6th's byte indicates byte's order (1: LSB / 2: MSB)
 TEST_F(ELFTest, ByteOrder) {
-  ASSERT_TRUE(elf.getE_ident()[5] & 1);
+  ASSERT_TRUE(elf.getEi_data() == 0x01);
 }
 
 #endif

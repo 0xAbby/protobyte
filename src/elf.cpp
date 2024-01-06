@@ -11,72 +11,86 @@
 
 ELF::ELF() {}
 ELF::~ELF() {}
+
+/**
+ * @brief ELF class constructor to pass filename to init() for parsing.
+ *
+ * @return none.
+ */
 ELF::ELF(std::string filename) {
-  init(filename);
+//  init(filename);
 }
 
+/**
+ * @brief Initiates parsing by calling releavant methods.
+ * 
+ * @param filename a string object containing name of file to parse.
+ *
+ * @return none.
+ */
 void ELF::init(std::string filename) {
   std::ifstream file(filename, std::ios::binary);
-  file.get(reinterpret_cast<char*>(e_ident), 16);
 
-  if (e_ident[4] & 1) {
-    // e_ident's 6th byte indicates 1: LSB / 2: MSB
-    parse32(file, e_ident[5] & 1);
-    // std::cout << " 32 bit" << std::endl;
-  } else if (e_ident[4] & 2) {
-    parse64(file, e_ident[5] & 1);
-    // std::cout << "64 bit" << std::endl;
+  magicBytes_u32 = FileIO::read_u32(file, false);
+  ei_class_u8 =  FileIO::read_u8(file);
+  ei_data_u8  = FileIO::read_u8(file);
+  ei_version_u8 = FileIO::read_u8(file);
+  ei_osabi_u8 = FileIO::read_u8(file);
+
+  file.seekg(0x10);
+  
+  if (ei_class_u8 & 1) {
+    parse32(file, ei_data_u8);
+    //std::cout << "32 bit ELF" << std::endl;
+  } else if (ei_class_u8 & 2) {
+    parse64(file, ei_data_u8);
+    //std::cout << "64 bit ELF" << std::endl;
   }
 
   mapFlags();
-  // print basic info
-  using namespace std;
-  cout << "Magic bytes: \t" << hex << e_ident << endl;
-  cout << "Architecture: \t" << eclassFlags[e_ident[4]] << endl;
-  cout << "Byte order: \t" << edataFlags[e_ident[5]] << endl;
-  cout << "Flags: \t\t" << emachineFlags[e_machine_u16] << " " << etypeFlags[e_type_u16] << endl;
-  cout << "Entry point address: \t\t0x" << hex << e_entry_u64 << endl;
 }
 
-
+/**
+ * @brief Saves integer IDs and their meanings into mappings.
+ *
+ * @return none.
+ */
 void ELF::mapFlags() {
   using namespace std;
-  etypeFlags.insert(pair<uint32_t, string>(0, "NONE"));
-  etypeFlags.insert(pair<uint32_t, string>(1, "ET_REL"));
-  etypeFlags.insert(pair<uint32_t, string>(2, "ET_EXEC"));
-  etypeFlags.insert(pair<uint32_t, string>(3, "ET_DYN"));
-  etypeFlags.insert(pair<uint32_t, string>(4, "ET_CORE"));
-  etypeFlags.insert(pair<uint32_t, string>(5, "ET_LOOS"));
+  etypeFlags.insert(pair<uint16_t, string>(0, "NONE"));
+  etypeFlags.insert(pair<uint16_t, string>(1, "ET_REL"));
+  etypeFlags.insert(pair<uint16_t, string>(2, "ET_EXEC"));
+  etypeFlags.insert(pair<uint16_t, string>(3, "Dynamic / position independant ET_DYN"));
+  etypeFlags.insert(pair<uint16_t, string>(4, "ET_CORE"));
+  etypeFlags.insert(pair<uint16_t, string>(5, "ET_LOOS"));
 
-  emachineFlags.insert(pair<uint32_t, string>(40, "ARM (EM_ARM)"));
-  emachineFlags.insert(pair<uint32_t, string>(41, "EM_ALPHA"));
-  emachineFlags.insert(pair<uint32_t, string>(50, "EM_IA_64"));
-  emachineFlags.insert(pair<uint32_t, string>(51, "EM_MIPS_X"));
-  emachineFlags.insert(pair<uint32_t, string>(62, "64bit (EM_X86_64)"));
-  emachineFlags.insert(pair<uint32_t, string>(3, "intel 386 (EM_386)"));
-  emachineFlags.insert(pair<uint32_t, string>(8, "MIPS (EM_MIPS)"));
-  emachineFlags.insert(pair<uint32_t, string>(10, "EM_MIPS_RS3_LE"));
+  emachineFlags.insert(pair<uint16_t, string>(40, "ARM (EM_ARM)"));
+  emachineFlags.insert(pair<uint16_t, string>(41, "EM_ALPHA"));
+  emachineFlags.insert(pair<uint16_t, string>(50, "EM_IA_64"));
+  emachineFlags.insert(pair<uint16_t, string>(51, "EM_MIPS_X"));
+  emachineFlags.insert(pair<uint16_t, string>(62, "64bit (EM_X86_64)"));
+  emachineFlags.insert(pair<uint16_t, string>(3, "Intel 386 (EM_386)"));
+  emachineFlags.insert(pair<uint16_t, string>(8, "MIPS (EM_MIPS)"));
+  emachineFlags.insert(pair<uint16_t, string>(10, "EM_MIPS_RS3_LE"));
 
-  eclassFlags.insert(pair<uint32_t, string>(1, "32bit (ELFCLASS32)"));
-  eclassFlags.insert(pair<uint32_t, string>(2, "64bit (ELFCLASS64)"));
+  eclassFlags.insert(pair<uint16_t, string>(1, "32bit (ELFCLASS32)"));
+  eclassFlags.insert(pair<uint16_t, string>(2, "64bit (ELFCLASS64)"));
 
-  edataFlags.insert(pair<uint32_t, string>(1, "Little Endian (LSB)"));
-  edataFlags.insert(pair<uint32_t, string>(2, "Big Endian (MSB)"));
+  edataFlags.insert(pair<uint16_t, string>(1, "Least Significant Byte (LSB)"));
+  edataFlags.insert(pair<uint16_t, string>(2, "Most Significant Byte (MSB)"));
 
-  eiosabiFlags.insert(pair<uint32_t, string>(0, "NONE"));
-  eiosabiFlags.insert(pair<uint32_t, string>(1, "HPUX"));
-  eiosabiFlags.insert(pair<uint32_t, string>(2, "NETBSD"));
-  eiosabiFlags.insert(pair<uint32_t, string>(3, "Linux"));
-  eiosabiFlags.insert(pair<uint32_t, string>(6, "SOLARIS"));
-  eiosabiFlags.insert(pair<uint32_t, string>(7, "AIX"));
-  eiosabiFlags.insert(pair<uint32_t, string>(8, "IRIX"));
-  eiosabiFlags.insert(pair<uint32_t, string>(9, "FREEBSD"));
-  eiosabiFlags.insert(pair<uint32_t, string>(10, "TRU64"));
-  eiosabiFlags.insert(pair<uint32_t, string>(12, "OPENBSD"));
-  eiosabiFlags.insert(pair<uint32_t, string>(64, "ARM_AEABI"));
-  eiosabiFlags.insert(pair<uint32_t, string>(97, "ARM"));
-
-
+  eiosabiFlags.insert(pair<uint16_t, string>(0, "NONE"));
+  eiosabiFlags.insert(pair<uint16_t, string>(1, "HPUX"));
+  eiosabiFlags.insert(pair<uint16_t, string>(2, "NETBSD"));
+  eiosabiFlags.insert(pair<uint16_t, string>(3, "Linux"));
+  eiosabiFlags.insert(pair<uint16_t, string>(6, "SOLARIS"));
+  eiosabiFlags.insert(pair<uint16_t, string>(7, "AIX"));
+  eiosabiFlags.insert(pair<uint16_t, string>(8, "IRIX"));
+  eiosabiFlags.insert(pair<uint16_t, string>(9, "FREEBSD"));
+  eiosabiFlags.insert(pair<uint16_t, string>(10, "TRU64"));
+  eiosabiFlags.insert(pair<uint16_t, string>(12, "OPENBSD"));
+  eiosabiFlags.insert(pair<uint16_t, string>(64, "ARM_AEABI"));
+  eiosabiFlags.insert(pair<uint16_t, string>(97, "ARM"));
 }
 
 /**
@@ -92,19 +106,19 @@ void ELF::mapFlags() {
 void ELF::parse32(std::ifstream& file, bool littleEndian) {
   file.seekg(0x10);
   // Elf header
-  e_type_u16 = read_u16(file, littleEndian);
-  e_machine_u16 = read_u16(file, littleEndian);
-  e_version_u32 = read_u32(file, littleEndian);
-  e_entry_u64 = read_u32(file, littleEndian);
-  e_phoff_u64 = read_u32(file, littleEndian);
-  e_shoff_u64 = read_u32(file, littleEndian);
-  e_flags_u32 = read_u32(file, littleEndian);
-  e_ehsize_u16 = read_u16(file, littleEndian);
-  e_phentsize_u16 = read_u16(file, littleEndian);
-  e_phnum_u16 = read_u16(file, littleEndian);
-  e_shentsize_u16 = read_u16(file, littleEndian);
-  e_shnum_u16 = read_u16(file, littleEndian);
-  e_shstrndx_u16 = read_u16(file, littleEndian);
+  e_type_u16 = FileIO::read_u16(file, littleEndian);
+  e_machine_u16 = FileIO::read_u16(file, littleEndian);
+  e_version_u32 = FileIO::read_u32(file, littleEndian);
+  e_entry_u64 = FileIO::read_u32(file, littleEndian);
+  e_phoff_u64 = FileIO::read_u32(file, littleEndian);
+  e_shoff_u64 = FileIO::read_u32(file, littleEndian);
+  e_flags_u32 = FileIO::read_u32(file, littleEndian);
+  e_ehsize_u16 = FileIO::read_u16(file, littleEndian);
+  e_phentsize_u16 = FileIO::read_u16(file, littleEndian);
+  e_phnum_u16 = FileIO::read_u16(file, littleEndian);
+  e_shentsize_u16 = FileIO::read_u16(file, littleEndian);
+  e_shnum_u16 = FileIO::read_u16(file, littleEndian);
+  e_shstrndx_u16 = FileIO::read_u16(file, littleEndian);
 }
 
 /**
@@ -120,19 +134,19 @@ void ELF::parse32(std::ifstream& file, bool littleEndian) {
 void ELF::parse64(std::ifstream& file, bool littleEndian) {
   file.seekg(0x10);
   // Elf header
-  e_type_u16 = read_u16(file, littleEndian);
-  e_machine_u16 = read_u16(file, littleEndian);
-  e_version_u32 = read_u32(file, littleEndian);
-  e_entry_u64 = read_u64(file, littleEndian);
-  e_phoff_u64 = read_u64(file, littleEndian);
-  e_shoff_u64 = read_u64(file, littleEndian);
-  e_flags_u32 = read_u32(file, littleEndian);
-  e_ehsize_u16 = read_u16(file, littleEndian);
-  e_phentsize_u16 = read_u16(file, littleEndian);
-  e_phnum_u16 = read_u16(file, littleEndian);
-  e_shentsize_u16 = read_u16(file, littleEndian);
-  e_shnum_u16 = read_u16(file, littleEndian);
-  e_shstrndx_u16 = read_u16(file, littleEndian);
+  e_type_u16 = FileIO::read_u16(file, littleEndian);
+  e_machine_u16 = FileIO::read_u16(file, littleEndian);
+  e_version_u32 = FileIO::read_u32(file, littleEndian);
+  e_entry_u64 = FileIO::read_u64(file, littleEndian);
+  e_phoff_u64 = FileIO::read_u64(file, littleEndian);
+  e_shoff_u64 = FileIO::read_u64(file, littleEndian);
+  e_flags_u32 = FileIO::read_u32(file, littleEndian);
+  e_ehsize_u16 = FileIO::read_u16(file, littleEndian);
+  e_phentsize_u16 = FileIO::read_u16(file, littleEndian);
+  e_phnum_u16 = FileIO::read_u16(file, littleEndian);
+  e_shentsize_u16 = FileIO::read_u16(file, littleEndian);
+  e_shnum_u16 = FileIO::read_u16(file, littleEndian);
+  e_shstrndx_u16 = FileIO::read_u16(file, littleEndian);
 }
 
 /**
@@ -153,65 +167,116 @@ void ELF::readE_ident(std::ifstream& file) {
   }
 }
 
-uint16_t read16_be(std::ifstream& in) {
-  uint16_t value = 0;
-  unsigned char ch[3] = {0};
 
-  in.read(reinterpret_cast<char*>(ch), 2);
-  value = uint16_t(ch[0]) << 8;
-  value |= uint16_t(ch[1]);
-
-  return value;
-}
 /**
- * @brief Reads 32 bits and returns them in big endian byte order.
+ * @brief Returns ELF's E_ident.
  *
- * @param in An std::ifstream object with PE file already opened,
- *
- * @return a 32 bit unsigned integer.
  */
-uint32_t read32_be(std::ifstream& in) {
-  uint32_t value = 0;
-  unsigned char ch[4] = {0};
-
-  in.read(reinterpret_cast<char*>(ch), 4);
-
-  value |= uint32_t(ch[0]) << 24;
-  value |= uint32_t(ch[1]) << 16;
-  value |= uint32_t(ch[2]) << 8;
-  value |= uint32_t(ch[3]);
-
-  return value;
-}
-uint64_t read64_be(std::ifstream& in) {
-  uint64_t value = 0;
-  unsigned char ch[9] = {0};
-
-  in.read(reinterpret_cast<char*>(ch), 8);
-  value |= uint64_t(ch[0]) << 56;
-  value |= uint64_t(ch[1]) << 48;
-  value |= uint64_t(ch[2]) << 40;
-  value |= uint64_t(ch[3]) << 32;
-  value |= uint64_t(ch[4]) << 24;
-  value |= uint64_t(ch[5]) << 16;
-  value |= uint64_t(ch[6]) << 8;
-  value |= uint64_t(ch[7]);
-
-  return value;
-}
-
 unsigned char* ELF::getE_ident() {
   return this->e_ident;
 }
-uint16_t ELF::getE_type() {
+/**
+ * @brief Returns ELF's E_type.
+ *
+ */
+uint16_t ELF::getE_type() const {
   return this->e_type_u16;
 }
-uint16_t ELF::getE_machine() {
+
+/**
+ * @brief Returns ELF's E_machine.
+ *
+ * @return ELF's e_machine value.
+ */
+uint16_t ELF::getE_machine() const {
   return this->e_machine_u16;
 }
-uint64_t ELF::getE_phoff() {
+
+/**
+ * @brief Returns ELF's E_phoff.
+ *
+ */
+uint64_t ELF::getE_phoff() const {
   return this->e_phoff_u64;
 }
-uint64_t ELF::getE_entry() {
+
+/**
+ * @brief Returns ELF's E_entry.
+ *
+ */
+uint64_t ELF::getE_entry() const {
   return this->e_entry_u64;
+}
+
+/**
+ * @brief Returns ELF's magic bytes.
+ *
+ */
+uint32_t ELF::getMagicBytes() const {
+  return this->magicBytes_u32;
+}
+
+/**
+ * @brief Returns ELF's ei_class byte.
+ *
+ * @return ELF's ei_class byte value.
+ */
+uint16_t ELF::getEi_class() const {
+  return this->ei_class_u8;
+}
+
+/**
+ * @brief Returns ELF's ei_data byte.
+ *
+  */
+uint16_t ELF::getEi_data() const {
+  return this->ei_data_u8;
+}
+
+/**
+ * @brief Returns ELF's ei_osabi byte.
+ *
+  */
+uint16_t ELF::getEi_osabi() const {
+  return this->ei_osabi_u8;
+}
+
+/**
+ * @brief Returns ELF's e_class flag bytes.
+ *
+ */
+std::map<uint16_t, std::string> ELF::getEclassFlags() const {
+  return this->eclassFlags; 
+}
+
+/**
+ * @brief Returns ELF's e_data flag bytes.
+ *
+ */
+std::map<uint16_t, std::string> ELF::getEdataFlags() const {
+  return this->edataFlags;
+}
+
+/**
+ * @brief Returns ELF's magic bytes.
+ *
+ */
+std::map<uint16_t, std::string> ELF::getEiosabiFlags() const {
+  return this->eiosabiFlags; 
+}
+
+/**
+ * @brief Returns ELF's e_type flag bytes.
+ *
+ */
+std::map<uint16_t, std::string> ELF::getEtypeFlags() const {
+  return this->etypeFlags;
+}
+
+/**
+ * @brief Returns ELF's e_machine flag bytes.
+ *
+ */
+std::map<uint16_t, std::string> ELF::getEmachineFlags() const {
+  return this->emachineFlags;
 }
