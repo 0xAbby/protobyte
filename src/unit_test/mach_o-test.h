@@ -13,26 +13,36 @@
 #include <gtest/gtest.h>
 #include "../headers.h"
 
-// class MACHO_OTest : public testing::Test {
-// public:
-//     ELF elf;
-//     ELFTest() {
-//         elf.init("../../test_samples/elf/lshw");
-//     }
-//     ~ELFTest() {
-//     }
-// };
+class MACHO_Test : public testing::Test {
+public:
+    MACHO mach_o;
+    MACHO_Test() {
+        mach_o.init("../../samples/elf/MachO-OSX-x64-ls");
+    }
+    ~MACHO_Test() {
+    }
+};
 
-// // last two bits in the 5th byte of magic bytes indicates whether ELF is 32 /
-// 64 bit
-// // 2 is for 64bit
-// TEST_F(ELFTest, e_ident) {
-//     ASSERT_TRUE(elf.getE_ident()[4] & 2 );
+
+// TEST_F(MACHO_Test, MagicBytes) {
+//     ASSERT_TRUE(mach_o.getMagicBytes() == 0xFEEDFACF );
 // }
 
-// // e_ident 6th's byte indicates byte's order (1: LSB / 2: MSB)
-// TEST_F(ELFTest, ByteOrder) {
-//     ASSERT_TRUE(elf.getE_ident()[5] & 1 );
+// TEST_F(MACHO_Test, CPUtype) {
+//     ASSERT_TRUE(mach_o.getCputType() == 0x1000007 );
 // }
+
+// TEST_F(MACHO_Test, CPUsubtype) {
+//     ASSERT_TRUE(mach_o.getCpuSubType() == 0x80000003 );
+// }
+
+// TEST_F(MACHO_Test, LoadCommandSegmentName) {
+//     ASSERT_TRUE(mach_o.getLoadCommand()[1].getSegmentName() == "__TEXT" );
+// }
+
+// TEST_F(MACHO_Test, LoadCommandSegmentSize) {
+//     ASSERT_TRUE(mach_o.getLoadCommand()[1].getCommandSize() == 0x228 );
+// }
+
 
 #endif

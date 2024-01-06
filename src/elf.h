@@ -57,7 +57,7 @@ class ELF {
   unsigned char e_ident[16];
   uint8_t ei_class_u8;
   uint8_t ei_data_u8;
-  u_int8_t ei_version_u8;
+  uint8_t ei_version_u8;
   uint8_t ei_osabi_u8;
 
   uint16_t e_type_u16;
@@ -96,7 +96,7 @@ class ELF {
   uint64_t sh_addralign_u64;
   uint64_t sh_entsize_u64;
 
-  
+
   std::map<uint16_t, std::string> etypeFlags;    // map 0
   std::map<uint16_t, std::string> emachineFlags; // map 1
   std::map<uint16_t, std::string> eclassFlags;   // map 2
@@ -105,7 +105,7 @@ class ELF {
 };
 
 /*
-Important sections:
+sections:
 .interp
 .init
 .plt

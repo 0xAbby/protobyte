@@ -30,9 +30,9 @@ class FileIO : public PE, public MACHO, public ELF {
   FileIO(std::string);
   virtual ~FileIO();
 
-  template<typename T> void printPE(T&) const;
-  template<typename T> void printELF(T&) const;
-  template<typename T> void printMachO(T&) const;
+  void printPE(PE&) const;
+  void printELF(ELF&) const;
+  void printMachO(MACHO&) const;
 
   /**
    * @brief Functions used for reading unsigned bytes, of various lengths.

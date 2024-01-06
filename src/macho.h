@@ -30,6 +30,30 @@ class MachOSection {
  */
 class LoadCommand {
  public:
+  void setCommand(uint32_t);
+  void setCommandSize(uint32_t);
+  void setSegmentName(std::ifstream&);
+  void setVMaddress(uint64_t);
+  void setVMSize(uint64_t);
+  void setFileOffset(uint64_t);
+  void setFileSize(uint64_t);
+  void setMaxProtection(uint32_t);
+  void setInitialProtection(uint32_t);
+  void setNumberOfSections(uint32_t);
+  void setFlags(uint32_t);
+
+  uint32_t getCommand();
+  uint32_t getCommandSize() const;
+  std::string getSegmentName() const;
+  uint64_t getVMaddress() const;
+  uint64_t getVMSize() const;
+  uint64_t getFileOffset() const;
+  uint64_t getFileSize() const;
+  uint32_t getMaxProtection() const;
+  uint32_t getInitialProtection() const;
+  uint32_t getNumberOfSections() const;
+  uint32_t getFlags() const;
+
  private:
   uint32_t command_u32;
   uint32_t commandSize_u32;
@@ -57,8 +81,8 @@ class LoadCommand {
 class MACHO {
  public:
  // disabling move/copy constructors
-  MACHO(MACHO&) = delete;
-  MACHO(MACHO&&) = delete;
+  //MACHO(MACHO&) = delete;
+  //MACHO(MACHO&&) = delete;
   MACHO & operator=( MACHO&) = delete;
 
   MACHO();
@@ -66,7 +90,24 @@ class MACHO {
   MACHO(std::string);
 
   void init(std::string);
-  void parse32_macho(std::ifstream&);
+  void parseX86_macho(std::ifstream&);
+  void parseUniMacho(std::ifstream&);
+
+  void setMagicBytes(uint32_t);
+  void setCputType(uint32_t);
+  void setCpuSubType(uint32_t);
+  void setFileType(uint32_t);
+  void setNumLoadCommands(uint32_t);
+  void setSizeOfLoadCommand(uint32_t);
+
+  uint32_t getMagicBytes() const;
+  uint32_t getCputType() const;
+  uint32_t getCpuSubType() const;
+  uint32_t getFileType() const;
+  uint32_t getNumLoadCommands() const;
+  uint32_t getSizeOfLoadCommand() const;
+  uint32_t getFlags() const;
+  std::vector<LoadCommand> getLoadCommand() const;
 
  private:
   // header
@@ -77,9 +118,8 @@ class MACHO {
   uint32_t numLoadCommands_u32;
   uint32_t sizeOfLoadCommand_u32;
   uint32_t flags_u32;
-  uint32_t resreved_u32;
-
-  LoadCommand* loadCommand;  // an array of loadcommand objects
+  uint32_t reserved_u32; // x64 specific
+  std::vector<LoadCommand> loadCommand; 
 };
 
 #endif

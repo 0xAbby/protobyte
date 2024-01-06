@@ -60,7 +60,7 @@ void ELF::mapFlags() {
   etypeFlags.insert(pair<uint16_t, string>(0, "NONE"));
   etypeFlags.insert(pair<uint16_t, string>(1, "ET_REL"));
   etypeFlags.insert(pair<uint16_t, string>(2, "ET_EXEC"));
-  etypeFlags.insert(pair<uint16_t, string>(3, "Dynamic / position independant ET_DYN"));
+  etypeFlags.insert(pair<uint16_t, string>(3, "Dynamic / Position Independant ET_DYN"));
   etypeFlags.insert(pair<uint16_t, string>(4, "ET_CORE"));
   etypeFlags.insert(pair<uint16_t, string>(5, "ET_LOOS"));
 

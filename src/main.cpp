@@ -16,9 +16,9 @@ int main(int argc, char* argv[]) {
     }
     FileIO file(argv[1]);
   }
-  catch (std::exception& e)
+  catch (std::exception& except)
   {
-    std::cerr << "Exception: " << e.what() << "\n"; // exepction.. 
+    std::cerr << "Exception: " << except.what() << "\n";
   }
   return 0;
 }

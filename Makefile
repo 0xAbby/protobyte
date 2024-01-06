@@ -7,7 +7,7 @@
 #//  Abdullah Ada
 #//
 CC= g++
-ARGS= -Wall -O2 -std=c++20
+ARGS= -Wall -O2 -std=c++20 -g
 SRC= ./src
 BUILD= ./build
 
