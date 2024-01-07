@@ -12,6 +12,43 @@
 #include "headers.h"
 
 
+class SectionHeader {
+  public:
+    void setSh_name_u32(uint32_t);
+    void setSh_type_u32(uint32_t);
+    void setSh_flags_u64(uint32_t);
+    void setSh_addr_u64(uint32_t);
+    void setSh_offset_u64(uint32_t);
+    void setSh_size_u64(uint32_t);
+    void setSh_link_u32(uint32_t);
+    void setSh_info_u32(uint32_t);
+    void setSh_addralign_u64(uint32_t);
+    void setSh_entsize_u64(uint32_t);
+
+    uint32_t getSh_name_u32(uint32_t);
+    uint32_t getSh_type_u32(uint32_t);
+    uint32_t getSh_flags_u64(uint32_t);
+    uint32_t getSh_addr_u64(uint32_t);
+    uint32_t getSh_offset_u64(uint32_t);
+    uint32_t getSh_size_u64(uint32_t);
+    uint32_t getSh_link_u32(uint32_t);
+    uint32_t getSh_info_u32(uint32_t);
+    uint32_t getSh_addralign_u64(uint32_t);
+    uint32_t getSh_entsize_u64(uint32_t);
+
+  private:
+    uint32_t sh_name_u32;
+    uint32_t sh_type_u32;
+    uint64_t sh_flags_u64;
+    uint64_t sh_addr_u64;
+    uint64_t sh_offset_u64;
+    uint64_t sh_size_u64;
+    uint32_t sh_link_u32;
+    uint32_t sh_info_u32;
+    uint64_t sh_addralign_u64;
+    uint64_t sh_entsize_u64;
+};
+
 /**
  * @brief ELF class handles parsing specific ELF format.
  */
@@ -32,6 +69,7 @@ class ELF {
   void parse32(std::ifstream& file, bool littleEndian);
   void readE_ident(std::ifstream& file);
   void mapFlags();
+  void printElf();
 
   unsigned char* getE_ident();
   uint16_t getE_type() const;
@@ -43,13 +81,19 @@ class ELF {
   uint16_t getEi_data() const;
   uint16_t getEi_osabi() const;
 
+  void printFlag(uint32_t);
+
   std::map<uint16_t, std::string> getEtypeFlags() const;
   std::map<uint16_t, std::string> getEmachineFlags() const;
   std::map<uint16_t, std::string> getEclassFlags() const;
   std::map<uint16_t, std::string> getEdataFlags() const;
   std::map<uint16_t, std::string> getEiosabiFlags() const;
 
-  std::map<uint16_t, std::string> getMapFlag(uint8_t) const;
+  enum flags { ETYPE = 0,
+               EMACHINE = 1,
+               ECLASS,
+               EDATA, 
+               EIOSABI };
 
  private:
   // Elfxx_Ehdr
@@ -85,23 +129,13 @@ class ELF {
   uint64_t p_align_u64;
 
   // Elfxx_Shdr
-  uint32_t sh_name_u32;
-  uint32_t sh_type_u32;
-  uint64_t sh_flags_u64;
-  uint64_t sh_addr_u64;
-  uint64_t sh_offset_u64;
-  uint64_t sh_size_u64;
-  uint32_t sh_link_u32;
-  uint32_t sh_info_u32;
-  uint64_t sh_addralign_u64;
-  uint64_t sh_entsize_u64;
+  std::vector<SectionHeader> sectionHeader;
 
-
-  std::map<uint16_t, std::string> etypeFlags;    // map 0
-  std::map<uint16_t, std::string> emachineFlags; // map 1
-  std::map<uint16_t, std::string> eclassFlags;   // map 2
-  std::map<uint16_t, std::string> edataFlags;    // map 3
-  std::map<uint16_t, std::string> eiosabiFlags;  // map 4
+  std::map<uint16_t, std::string> eclassFlags;   
+  std::map<uint16_t, std::string> emachineFlags; 
+  std::map<uint16_t, std::string> etypeFlags;    
+  std::map<uint16_t, std::string> edataFlags;    
+  std::map<uint16_t, std::string> eiosabiFlags;  
 };
 
 /*

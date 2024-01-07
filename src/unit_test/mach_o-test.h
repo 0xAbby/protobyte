@@ -17,32 +17,32 @@ class MACHO_Test : public testing::Test {
 public:
     MACHO mach_o;
     MACHO_Test() {
-        mach_o.init("../../samples/elf/MachO-OSX-x64-ls");
+        mach_o.init("../../samples/mach-o/MachO-OSX-x64-ls");
     }
     ~MACHO_Test() {
     }
 };
 
 
-// TEST_F(MACHO_Test, MagicBytes) {
-//     ASSERT_TRUE(mach_o.getMagicBytes() == 0xFEEDFACF );
-// }
+TEST_F(MACHO_Test, MagicBytes) {
+    ASSERT_TRUE(mach_o.getMagicBytes() == 0xFEEDFACF );
+}
 
-// TEST_F(MACHO_Test, CPUtype) {
-//     ASSERT_TRUE(mach_o.getCputType() == 0x1000007 );
-// }
+TEST_F(MACHO_Test, CPUtype) {
+    ASSERT_TRUE(mach_o.getCputType() == 0x1000007 );
+}
 
-// TEST_F(MACHO_Test, CPUsubtype) {
-//     ASSERT_TRUE(mach_o.getCpuSubType() == 0x80000003 );
-// }
+TEST_F(MACHO_Test, CPUsubtype) {
+    ASSERT_TRUE(mach_o.getCpuSubType() == 0x80000003 );
+}
 
-// TEST_F(MACHO_Test, LoadCommandSegmentName) {
-//     ASSERT_TRUE(mach_o.getLoadCommand()[1].getSegmentName() == "__TEXT" );
-// }
+TEST_F(MACHO_Test, LoadCommandSegmentName) {
+    ASSERT_TRUE(mach_o.getLoadCommand()[1].getSegmentName() == "__TEXT" );
+}
 
-// TEST_F(MACHO_Test, LoadCommandSegmentSize) {
-//     ASSERT_TRUE(mach_o.getLoadCommand()[1].getCommandSize() == 0x228 );
-// }
+TEST_F(MACHO_Test, LoadCommandSegmentSize) {
+    ASSERT_TRUE(mach_o.getLoadCommand()[1].getCommandSize() == 0x228 );
+}
 
 
 #endif

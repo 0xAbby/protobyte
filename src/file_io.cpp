@@ -22,6 +22,9 @@ FileIO::~FileIO() {}
 FileIO::FileIO(std::string filename) {
   using namespace std;
   ifstream file(filename, ios::binary);
+  if (file.fail()) {
+    cout << "Error, cant find file." << endl;
+  }
   uint32_t bytes = read_u32(file, true);
 
   file.seekg(0);
@@ -37,13 +40,14 @@ FileIO::FileIO(std::string filename) {
 
     elf.init(filename);
     printELF(elf);
-  } else if (bytes == 0xfeedfacf || bytes == 0xfeedface ||
-             bytes == 0xcafebabe || bytes == 0xbebafeca) {
+  } else if (bytes == 0xfeedfacf || bytes == 0xfeedface) {
     // processing Mach-O
     MACHO mach_o;
 
     mach_o.init(filename);
     printMachO(mach_o);
+  } else if (bytes == 0xcafebabe || bytes == 0xbebafeca) {
+
   }
 }
 
@@ -55,35 +59,7 @@ FileIO::FileIO(std::string filename) {
  * @return none.
  */
 void FileIO::printMachO(MACHO& file) const {
-  using namespace std;
-
-  cout << "Mach-O File: \n";
-  cout << "  Magic bytes: \t0x" << hex << file.getMagicBytes() << endl;
-  cout << "  CPU type; \t0x" << hex << file.getCputType() << endl;
-  cout << "  CPU subtype: \t 0x" << hex << file.getCpuSubType() << endl;
-  cout << "  File type: \t 0x" << hex << file.getFileType() << endl;
-  cout << "  Number of load commands: \t0x" << hex << file.getNumLoadCommands() << endl;
-  cout << "  Size of Load commands: \t0x" << hex << file.getSizeOfLoadCommand() << endl << endl;
-
-  uint32_t numberOfLoadCommands = 4;
-  for(uint32_t idx = 0; idx < numberOfLoadCommands ; idx++) { 
-    cout << " command type: \t" << file.getLoadCommand()[idx].getCommand() << endl;
-    cout << " command size: \t0x" << hex << file.getLoadCommand()[idx].getCommandSize() << endl;
-    cout << " segment name: \t" << file.getLoadCommand()[idx].getSegmentName() << endl;
-    cout << " VM Address: \t0x" << hex << file.getLoadCommand()[idx].getVMaddress() << endl;
-    cout << " VM Size: \t0x" << hex <<  file.getLoadCommand()[idx].getVMSize() << endl;
-    cout << " file offset: \t0x" << hex << file.getLoadCommand()[idx].getFileOffset() << endl;
-    cout << " file size: \t0x" << hex << file.getLoadCommand()[idx].getFileSize() << endl << endl;
-
-  }
-  //  code directory info
-  //  start of section headers
-
-  // Fat mach-O file
-  //  magic bytes
-  //  fat_arch sections
-  //  mach-o header
-  //  
+  file.printMach();
 }
 
 /**
@@ -133,15 +109,7 @@ void FileIO::printPE(PE& file) const {
  * @return none.
  */
 void FileIO::printELF(ELF& file) const {
-  using namespace std;
-  cout << "Magic bytes: \t0x" << hex << file.getMagicBytes() << " | "
-       << file.getEclassFlags()[file.getEi_class()] << endl;
-  cout << "byte order: \t" << file.getEdataFlags()[file.getEi_data()]
-       << endl;
-  cout << "OS ABI: \t" << file.getEiosabiFlags()[file.getEi_osabi()] << endl;
-  cout << "Type: \t"   << file.getEtypeFlags()[file.getE_type()] << endl;
-  cout << "Machine: \t" << file.getEmachineFlags()[file.getE_machine()] << endl;
-  cout << "Entry Point: \t0x" << hex << file.getE_entry() << endl;
+  file.printElf();
 }
 
 /**

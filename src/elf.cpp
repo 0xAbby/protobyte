@@ -37,14 +37,13 @@ void ELF::init(std::string filename) {
   ei_version_u8 = FileIO::read_u8(file);
   ei_osabi_u8 = FileIO::read_u8(file);
 
+  // skipping e_ident field.
   file.seekg(0x10);
   
   if (ei_class_u8 & 1) {
     parse32(file, ei_data_u8);
-    //std::cout << "32 bit ELF" << std::endl;
   } else if (ei_class_u8 & 2) {
     parse64(file, ei_data_u8);
-    //std::cout << "64 bit ELF" << std::endl;
   }
 
   mapFlags();
@@ -119,6 +118,20 @@ void ELF::parse32(std::ifstream& file, bool littleEndian) {
   e_shentsize_u16 = FileIO::read_u16(file, littleEndian);
   e_shnum_u16 = FileIO::read_u16(file, littleEndian);
   e_shstrndx_u16 = FileIO::read_u16(file, littleEndian);
+
+  // skip to section header table;
+  file.seekg(e_shoff_u64);
+
+  uint32_t sh_name_u32 = FileIO::read_u32(file, littleEndian);
+  uint32_t sh_type_u32 = FileIO::read_u32(file, littleEndian);
+  uint64_t sh_flags_u64 = FileIO::read_u32(file, littleEndian);
+  uint64_t sh_addr_u64 = FileIO::read_u32(file, littleEndian);
+  uint64_t sh_offset_u64 = FileIO::read_u32(file, littleEndian);
+  uint64_t sh_size_u64 = FileIO::read_u32(file, littleEndian);
+  uint32_t sh_link_u32 = FileIO::read_u32(file, littleEndian);
+  uint32_t sh_info_u32 = FileIO::read_u32(file, littleEndian);
+  uint64_t sh_addralign_u64 = FileIO::read_u32(file, littleEndian);
+  uint64_t sh_entsize_u64 = FileIO::read_u32(file, littleEndian);
 }
 
 /**
@@ -279,4 +292,32 @@ std::map<uint16_t, std::string> ELF::getEtypeFlags() const {
  */
 std::map<uint16_t, std::string> ELF::getEmachineFlags() const {
   return this->emachineFlags;
+}
+
+void ELF::printFlag(uint32_t flag) {
+  if (flag == ECLASS)
+      std::cout << this->eclassFlags[ei_class_u8] << std::endl;
+  else if (flag == EDATA)
+      std::cout << this->edataFlags[ei_data_u8] << std::endl;
+  else if (flag == EMACHINE)
+      std::cout << this->emachineFlags[e_machine_u16] << std::endl;
+  else if (flag == EIOSABI)
+      std::cout << this->eiosabiFlags[ei_osabi_u8] << std::endl;
+  else if (flag == ETYPE)
+      std::cout << this->etypeFlags[e_type_u16] << std::endl;
+}
+
+void ELF::printElf() {
+  using namespace std;
+  cout << "Magic bytes: \t0x" << hex << this->getMagicBytes() << " | ";
+  this->printFlag(ECLASS); 
+  cout << "byte order: \t";
+  this->printFlag(EDATA);
+  cout << "OS ABI: \t"; 
+  this->printFlag(EIOSABI);
+  cout << "Type: \t";
+  this->printFlag(ETYPE);
+  cout << "Machine: \t";
+  this->printFlag(EMACHINE);
+  cout << "Entry Point: \t0x" << hex << this->getE_entry() << endl;
 }

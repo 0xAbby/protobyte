@@ -19,7 +19,7 @@
 /**
  * @brief FileIO class handles files that will parsed.
  */
-class FileIO : public PE, public MACHO, public ELF {
+class FileIO {
  public:
   // disabling move/copy constructors
   FileIO(FileIO&) = delete;

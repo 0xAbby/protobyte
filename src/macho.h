@@ -42,7 +42,7 @@ class LoadCommand {
   void setNumberOfSections(uint32_t);
   void setFlags(uint32_t);
 
-  uint32_t getCommand();
+  uint32_t getCommandType();
   uint32_t getCommandSize() const;
   std::string getSegmentName() const;
   uint64_t getVMaddress() const;
@@ -99,6 +99,9 @@ class MACHO {
   void setFileType(uint32_t);
   void setNumLoadCommands(uint32_t);
   void setSizeOfLoadCommand(uint32_t);
+  void mapFlagDefinitions();
+  void printFlag(uint32_t, u_int32_t);
+  void printMach();
 
   uint32_t getMagicBytes() const;
   uint32_t getCputType() const;
@@ -119,7 +122,22 @@ class MACHO {
   uint32_t sizeOfLoadCommand_u32;
   uint32_t flags_u32;
   uint32_t reserved_u32; // x64 specific
+  
+  
+  
   std::vector<LoadCommand> loadCommand; 
+
+  std::map<uint32_t, std::string> magicMap_m;
+  std::map<uint32_t, std::string> cputType_m;
+  std::map<uint32_t, std::string> headerFileType_m;
+  std::map<uint32_t, std::string> headerFlags_m;
+  std::map<uint32_t, std::string> loadCommandType_m;
+
+  enum MachMaps { magictypes = 0,
+                  cputypes = 1,
+                  headerfiltype,
+                  headerflags,
+                  loadcommandtype};
 };
 
 #endif

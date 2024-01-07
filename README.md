@@ -62,6 +62,50 @@ Machine:        ARM (EM_ARM)
 Entry Point:    0x0
 ```
 
+Example for parsing Mach-O format:
+```
+$ ./binlyzer samples/mach-o/MachO-OSX-x86-ls 
+Mach-O File: 
+  Magic bytes: 	0xfeedface
+  CPU type; 	0x7
+  CPU subtype: 	 0x3
+  File type: 	 0x2
+  Number of load commands: 	0x10
+  Size of Load commands: 	0x5f8
+
+ command type: 	1
+ command size: 	0x38
+ segment name: 	__PAGEZERO
+ VM Address: 	0x0
+ VM Size: 	0x1000
+ file offset: 	0x0
+ file size: 	0x0
+
+ command type: 	1
+ command size: 	0x18c
+ segment name: 	__TEXT
+ VM Address: 	0x1000
+ VM Size: 	0x5000
+ file offset: 	0x0
+ file size: 	0x5000
+
+ command type: 	1
+ command size: 	0x214
+ segment name: 	__DATA
+ VM Address: 	0x6000
+ VM Size: 	0x1000
+ file offset: 	0x5000
+ file size: 	0x1000
+
+ command type: 	1
+ command size: 	0x38
+ segment name: 	__LINKEDIT
+ VM Address: 	0x7000
+ VM Size: 	0x3000
+ file offset: 	0x6000
+ file size: 	0x2b70
+
+```
 
 ### Unit testing (optional)
 
