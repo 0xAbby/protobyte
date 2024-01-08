@@ -12,32 +12,38 @@
 #include "headers.h"
 
 
+/**
+ * @brief Section header class carries section-specific info.
+ */
 class SectionHeader {
   public:
-    void setSh_name_u32(uint32_t);
-    void setSh_type_u32(uint32_t);
-    void setSh_flags_u64(uint32_t);
-    void setSh_addr_u64(uint32_t);
-    void setSh_offset_u64(uint32_t);
-    void setSh_size_u64(uint32_t);
-    void setSh_link_u32(uint32_t);
-    void setSh_info_u32(uint32_t);
-    void setSh_addralign_u64(uint32_t);
-    void setSh_entsize_u64(uint32_t);
+    void setSh_name(uint32_t);
+    void setSh_name(std::string);
+    void setSh_type(uint32_t);
+    void setSh_flags(uint32_t);
+    void setSh_addr(uint32_t);
+    void setSh_offset(uint32_t);
+    void setSh_size(uint32_t);
+    void setSh_link(uint32_t);
+    void setSh_info(uint32_t);
+    void setSh_addralign(uint32_t);
+    void setSh_entsize(uint32_t);
 
-    uint32_t getSh_name_u32(uint32_t);
-    uint32_t getSh_type_u32(uint32_t);
-    uint32_t getSh_flags_u64(uint32_t);
-    uint32_t getSh_addr_u64(uint32_t);
-    uint32_t getSh_offset_u64(uint32_t);
-    uint32_t getSh_size_u64(uint32_t);
-    uint32_t getSh_link_u32(uint32_t);
-    uint32_t getSh_info_u32(uint32_t);
-    uint32_t getSh_addralign_u64(uint32_t);
-    uint32_t getSh_entsize_u64(uint32_t);
+    uint32_t getSh_name();
+    std::string getS_name();
+    uint32_t getSh_type();
+    uint32_t getSh_flags();
+    uint32_t getSh_addr();
+    uint32_t getSh_offset();
+    uint32_t getSh_size();
+    uint32_t getSh_link();
+    uint32_t getSh_info();
+    uint32_t getSh_addralign();
+    uint32_t getSh_entsize();
 
   private:
     uint32_t sh_name_u32;
+    std::string name;
     uint32_t sh_type_u32;
     uint64_t sh_flags_u64;
     uint64_t sh_addr_u64;
@@ -47,6 +53,40 @@ class SectionHeader {
     uint32_t sh_info_u32;
     uint64_t sh_addralign_u64;
     uint64_t sh_entsize_u64;
+};
+
+/**
+ * @brief Program header class carries section-specific info.
+ */
+class ProgramHeader {
+  public:
+    void setP_type(uint32_t);
+    void setP_flags(uint32_t);
+    void setP_offset(uint64_t);
+    void setP_vaddr(uint64_t);
+    void setP_paddr(uint64_t);
+    void setP_filesz(uint64_t);
+    void setP_memsz(uint64_t);
+    void setP_align(uint64_t);
+
+    uint32_t getP_type();
+    uint32_t getP_flags();
+    uint64_t getP_offset();
+    uint64_t getP_vaddr();
+    uint64_t getP_paddr();
+    uint64_t getP_filesz();
+    uint64_t getP_memsz();
+    uint64_t getP_align();
+
+  private:
+    uint32_t p_type_u32;
+    uint32_t p_flags_u32;
+    uint64_t p_offset_u64;
+    uint64_t p_vaddr_u64;
+    uint64_t p_paddr_u64;
+    uint64_t p_filesz_u64;
+    uint64_t p_memsz_u64;
+    uint64_t p_align_u64;
 };
 
 /**
@@ -70,6 +110,7 @@ class ELF {
   void readE_ident(std::ifstream& file);
   void mapFlags();
   void printElf();
+  std::string getSectionHeaderName(uint32_t, uint32_t, std::ifstream&);
 
   unsigned char* getE_ident();
   uint16_t getE_type() const;
@@ -80,8 +121,13 @@ class ELF {
   uint16_t getEi_class() const;
   uint16_t getEi_data() const;
   uint16_t getEi_osabi() const;
+  uint64_t getE_shoff();
+  uint16_t getE_phentsize();
+  uint16_t getE_phnum();
+  uint16_t getE_shentsize();
+  uint16_t getE_shnum();
 
-  void printFlag(uint32_t);
+  void printFlag(uint32_t, uint32_t);
 
   std::map<uint16_t, std::string> getEtypeFlags() const;
   std::map<uint16_t, std::string> getEmachineFlags() const;
@@ -93,7 +139,12 @@ class ELF {
                EMACHINE = 1,
                ECLASS,
                EDATA, 
-               EIOSABI };
+               EIOSABI,
+               SECTIONTYPE,
+               SECTIONFLAG,
+               PROGRAMTYPE,
+               PROGRAMFLAG};
+  enum machine {EM_X86_64 = 50, EM_ARM = 41, EM_386 = 3  };
 
  private:
   // Elfxx_Ehdr
@@ -118,37 +169,21 @@ class ELF {
   uint16_t e_shnum_u16;
   uint16_t e_shstrndx_u16;
 
-  // Elfxx_Phdr
-  uint32_t p_type_u32;
-  uint32_t p_flags_u32;
-  uint64_t p_offset_u64;
-  uint64_t p_vaddr_u64;
-  uint64_t p_paddr_u64;
-  uint64_t p_filesz_u64;
-  uint64_t p_memsz_u64;
-  uint64_t p_align_u64;
-
-  // Elfxx_Shdr
+  
+  std::vector<ProgramHeader> programHeader;
   std::vector<SectionHeader> sectionHeader;
+  
 
   std::map<uint16_t, std::string> eclassFlags;   
   std::map<uint16_t, std::string> emachineFlags; 
   std::map<uint16_t, std::string> etypeFlags;    
   std::map<uint16_t, std::string> edataFlags;    
   std::map<uint16_t, std::string> eiosabiFlags;  
-};
 
-/*
-sections:
-.interp
-.init
-.plt
-.text
-.fini
-.rodata
-.data
-.bss
-.shstrtab
-*/
+  std::map<uint32_t, std::string> sectionHeaderType_m;
+  std::map<uint32_t, std::string> sectionHeaderFlag_m;
+  std::map<uint32_t, std::string> programHeaderType_m;
+  std::map<uint32_t, std::string> programHeaderFlag_m;  
+};
 
 #endif

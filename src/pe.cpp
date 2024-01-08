@@ -441,3 +441,30 @@ uint32_t DataDirectory::getVA() const {
 uint32_t DataDirectory::getSize() const {
   return this->size;
 }
+
+void PE::printPE() {
+  using namespace std;
+
+  cout << "Parsed info: \n\n";
+  // print magic bytes
+  cout << "Magic bytes: 0x" << hex << getDosMagic() << endl;
+
+  // print PE offset
+  cout << "PE offset: 0x" << hex << getElfanew() << endl;
+
+  // print number of section
+  cout << "Number of sections: " << getNumberOfSections() << endl;
+
+  // print characteristics
+  cout << "Characteristics: 0x" << hex << getCharacteristics() << endl
+       << endl;
+
+  // print sections information
+  for (uint32_t idx = 0; idx < numberOfSections_u16 ; idx++) {
+    cout << "Name: " << sections[idx].getName() << endl;
+    cout << " Virtual size: 0x" << hex << sections[idx].getVirtualSize() << endl;
+    cout << " Virtual Address: 0x" << hex << sections[idx].getVirtualAddress() << endl;
+    cout << " Characteristics: 0x" << hex << sections[idx].getCharacteristics();
+    cout << endl << endl;
+  }
+}

@@ -150,6 +150,7 @@ class PE {
   void readDataDirectory(std::ifstream&, std::vector<DataDirectory>&);
   void readSections(std::ifstream&, std::vector<PESection>&);
   void mapHeaderFlags();
+  void printPE();
 
   uint16_t getDosMagic() const;
   uint16_t getSections() const;

@@ -20,33 +20,21 @@ FileIO::~FileIO() {}
  * @return none.
  */
 FileIO::FileIO(std::string filename) {
-  using namespace std;
-  ifstream file(filename, ios::binary);
-  if (file.fail()) {
-    cout << "Error, cant find file." << endl;
-  }
-  uint32_t bytes = read_u32(file, true);
+  uint32_t bytes = fileID(filename);
 
-  file.seekg(0);
-  if (uint16_t(bytes) == 0x5a4d) {
-    // processing PE and print info
+  if (uint16_t(bytes) == PE_FILE) {
     PE pe;
-
     pe.init(filename);
     printPE(pe);
-  } else if (bytes == 0x464c457f) {
-    // processing ELF
+  } else if (bytes == ELF_FILE) {
     ELF elf;
-
     elf.init(filename);
     printELF(elf);
-  } else if (bytes == 0xfeedfacf || bytes == 0xfeedface) {
-    // processing Mach-O
+  } else if (bytes == MACHO_32_FILE || bytes == MACHO_64_FILE) {
     MACHO mach_o;
-
     mach_o.init(filename);
     printMachO(mach_o);
-  } else if (bytes == 0xcafebabe || bytes == 0xbebafeca) {
+  } else if (bytes == MACHO_FAT_FILE || bytes == MACHO_FAT_CIGAM_FILE) {
 
   }
 }
@@ -54,7 +42,7 @@ FileIO::FileIO(std::string filename) {
 /**
  * @brief A Method to print out parsed information from a class object.
  *
-* @param file A MACHO class object containing relevant information.
+* @param file A MACHO class object
  *
  * @return none.
  */
@@ -65,46 +53,18 @@ void FileIO::printMachO(MACHO& file) const {
 /**
  * @brief A Method to print out parsed information from a class object.
  *
- * @param file A PE class object containing relevant information.
+ * @param file A PE class object
  *
  * @return none.
  */
 void FileIO::printPE(PE& file) const {
-  using namespace std;
-
-  uint32_t numberOfSections = file.getNumberOfSections();
-  cout << "Parsed info: \n\n";
-
-  // print magic bytes
-  cout << "Magic bytes: 0x" << hex << file.getDosMagic() << endl;
-
-  // print PE offset
-  cout << "PE offset: 0x" << hex << file.getElfanew() << endl;
-
-  // print number of section
-  cout << "Number of sections: " << file.getNumberOfSections() << endl;
-
-  // print characteristics
-  cout << "Characteristics: 0x" << hex << file.getCharacteristics() << endl
-       << endl;
-
-  // print sections information
-  for (uint32_t idx = 0; idx < numberOfSections; idx++) {
-    cout << "Name: " << file.getSection(idx).getName() << endl;
-    cout << " Virtual size: 0x" << hex << file.getSection(idx).getVirtualSize()
-         << endl;
-    cout << " Virtual Address: 0x" << hex
-         << file.getSection(idx).getVirtualAddress() << endl;
-    cout << " Characteristics: 0x" << hex
-         << file.getSection(idx).getCharacteristics();
-    cout << endl << endl;
-  }
+  file.printPE();
 }
 
 /**
  * @brief A Method to print out parsed information from a class object.
  *
-* @param file A ELF class object containing relevant information.
+* @param file A ELF class object
  *
  * @return none.
  */
@@ -212,4 +172,16 @@ uint64_t FileIO::read_u64(std::ifstream& in, bool littleEnd) {
     value |= uint64_t(ch[7]);
   }
   return value;
+}
+
+uint32_t FileIO::fileID(std::string filename) const{
+  using namespace std;
+  ifstream file(filename, ios::binary);
+  if (file.fail()) {
+    cout << "Error, cant find file." << endl;
+  }
+  uint32_t bytes = read_u32(file, true);
+  file.close();
+
+  return bytes;
 }
