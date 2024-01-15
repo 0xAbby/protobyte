@@ -2,14 +2,14 @@
  * @file runTests.cpp
  * @brief  Unit tests main source code.
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
 
-#include "elftest.h"
-#include "petest.h"
-#include "mach_o-test.h"
+#include "include/elftest.h"
+#include "include/petest.h"
+#include "include/mach_o-test.h"
 
 int main(int argc, char* argv[]) {
   testing::InitGoogleTest(&argc, argv);

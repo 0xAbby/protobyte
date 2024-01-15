@@ -3,14 +3,14 @@
  * @brief  Definitions and declarations for PE module, Dos header, PE header,
  * sections, and directories.
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
 #ifndef PE_H
 #define PE_H
 
-#include "headers.h"
+#include "../headers.h"
 
 // PE image type
 #define OPTIONAL_IMAGE_PE32 0x10b
@@ -88,6 +88,9 @@ class PESection {
   uint32_t numberOfSections_u32;
 };
 
+/**
+ * @brief Holds information for imported DLLs by PE file.
+ */
 class ImportDirectory {
  public:
   ImportDirectory();
@@ -101,6 +104,9 @@ class ImportDirectory {
   uint32_t importAddressRVA_u32;
 };
 
+/**
+ * @brief Holds information for exported DLL functions.
+ */
 class ExportDirectory {
  public:
   ExportDirectory();

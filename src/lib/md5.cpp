@@ -1,15 +1,11 @@
-/*
- * This code implements the MD5 message-digest algorithm.
- * The algorithm is due to Ron Rivest.  This code was
- * written by Colin Plumb in 1993, no copyright is claimed.
- * This code is in the public domain; do with it what you wish.
- * source:
- * https://opensource.apple.com/source/Security/Security-28/AppleCSP/MiscCSPAlgs/MD5.c
- *
- * Equivalent code is available from RSA Data Security, Inc.
- * This code has been tested against that, and is equivalent,
- * except that you don't need to include two pages of legalese
- * with every copy.
+/**
+ * md5.cpp: 
+ *  @brief  This code implements the MD5 message-digest algorithm.
+ *    The algorithm is due to Ron Rivest.  This code was
+ *    written by Colin Plumb in 1993, no copyright is claimed.
+ *    This code is in the public domain; do with it what you wish.
+ *    source:
+ *    @ref https://opensource.apple.com/source/Security/Security-28/AppleCSP/MiscCSPAlgs/MD5.c
  *
  * To compute the message digest of a chunk of bytes, declare an
  * MD5Context structure, pass it to MD5Init, call MD5Update as
@@ -46,12 +42,11 @@ static void byteReverse(unsigned char *buf, unsigned longs)
 }
 #endif
 
-/*
- * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
+/**
+ * @brief Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
  * initialization constants.
  */
-void MD5Hasher::MD5Init()
-{
+void MD5Hasher::MD5Init() {
   ctx.buf[0] = 0x67452301;
   ctx.buf[1] = 0xefcdab89;
   ctx.buf[2] = 0x98badcfe;
@@ -61,12 +56,11 @@ void MD5Hasher::MD5Init()
   ctx.bits[1] = 0;
 }
 
-/*
- * Update context to reflect the concatenation of another buffer full
+/** 
+ * @brief Update context to reflect the concatenation of another buffer full
  * of bytes.
  */
-void MD5Hasher::MD5Update(unsigned char *buf, unsigned len)
-{
+void MD5Hasher::MD5Update(unsigned char *buf, unsigned len) {
   uint32 t;
   uint32 lenp;
   /* Update bitcount */
@@ -113,12 +107,11 @@ void MD5Hasher::MD5Update(unsigned char *buf, unsigned len)
   memcpy(ctx.in, buf, len);
 }
 
-/*
- * Final wrapup - pad to 64-byte boundary with the bit pattern
+/**
+ * @brief Final wrapup - pad to 64-byte boundary with the bit pattern
  * 1 0* (64-bit count of bits processed, MSB-first)
  */
-std::string MD5Hasher::MD5Final()
-{
+std::string MD5Hasher::MD5Final() {
   unsigned count;
   unsigned char *p;
   unsigned char digest[16];
@@ -135,8 +128,7 @@ std::string MD5Hasher::MD5Final()
   count = 64 - 1 - count;
 
   /* Pad out to 56 mod 64 */
-  if (count < 8)
-  {
+  if (count < 8) {
     /* Two lots of padding:  Pad the first block to 64 bytes */
     memset(p, 0, count);
     byteReverse(ctx.in, 16);
@@ -144,9 +136,7 @@ std::string MD5Hasher::MD5Final()
 
     /* Now fill the next block with 56 bytes */
     memset(ctx.in, 0, 56);
-  }
-  else
-  {
+  } else {
     /* Pad block to 56 bytes */
     memset(p, 0, count - 8);
   }
@@ -162,8 +152,7 @@ std::string MD5Hasher::MD5Final()
   memset(&ctx, 0, sizeof(ctx));        /* In case it's sensitive */
 
   std::stringstream ss;
-  for (int i = 0; i < 16; i++)
-  {
+  for (int i = 0; i < 16; i++) {
     ss << std::setfill('0') <<
        std::setw(2) << std::hex << static_cast<int>(digest[i]);
   }
@@ -184,13 +173,12 @@ std::string MD5Hasher::MD5Final()
 #define MD5STEP(f, w, x, y, z, data, s) \
   (w += f(x, y, z) + data, w = w << s | w >> (32-s), w += x)
 
-/*
- * The core of the MD5 algorithm, this alters an existing MD5 hash to
+/**
+ * @brief The core of the MD5 algorithm, this alters an existing MD5 hash to
  * reflect the addition of 16 longwords of new data.  MD5Update blocks
  * the data and converts bytes into longwords for this routine.
  */
-void MD5Hasher::MD5Transform(uint32 buf[4], uint32 in[16])
-{
+void MD5Hasher::MD5Transform(uint32 buf[4], uint32 in[16]) {
   uint32 a, b, c, d;
 
   a = buf[0];
@@ -272,9 +260,15 @@ void MD5Hasher::MD5Transform(uint32 buf[4], uint32 in[16])
   buf[3] += d;
 }
 
-int MD5Hasher::MD5FileContent(
-  const std::string &file, std::string &md5)
-{
+/**
+ * @brief Takes in a filename open and caluclate hash.
+ * 
+ * @param file a string object containing the file name to be read.
+ * @param md5 a string object that will contain the MD5 hash result.
+ * 
+ * @return Returns 0 when it succeeds or -1 if it fails to read the file.
+*/
+int MD5Hasher::MD5FileContent(const std::string &file, std::string &md5) {
   FILE *fp;
   char bytesBuffer[1024];
   MD5Hasher hasher;
@@ -286,16 +280,12 @@ int MD5Hasher::MD5FileContent(
 
   hasher.MD5Init();
 
-  while ( !feof(fp) )
-  {
+  while ( !feof(fp) ) {
     size_t read = fread(bytesBuffer, 1, sizeof(bytesBuffer), fp);
 
-    if ( read == 0 )
-    {
+    if ( read == 0 ) {
       break;
-    }
-    else
-    {
+    } else {
       hasher.MD5Update((unsigned char*)bytesBuffer, read);
     }
   }

@@ -2,18 +2,18 @@
  * @file elf.h
  * @brief  Definitions and declarations for ELF module
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
 #ifndef ELF_H
 #define ELF_H
 
-#include "headers.h"
+#include "../headers.h"
 
 
 /**
- * @brief Section header class carries section-specific info.
+ * @brief Section header class carries section-specific info. name, type, flags...etc
  */
 class SectionHeader {
   public:
@@ -56,7 +56,7 @@ class SectionHeader {
 };
 
 /**
- * @brief Program header class carries section-specific info.
+ * @brief Program header class carries section-specific info, type, flags and offset...etc
  */
 class ProgramHeader {
   public:
@@ -90,7 +90,7 @@ class ProgramHeader {
 };
 
 /**
- * @brief ELF class handles parsing specific ELF format.
+ * @brief ELF class handles parsing specific ELF format. Magic bytes, header info...etc
  */
 class ELF {
  public:
@@ -134,7 +134,11 @@ class ELF {
   std::map<uint16_t, std::string> getEclassFlags() const;
   std::map<uint16_t, std::string> getEdataFlags() const;
   std::map<uint16_t, std::string> getEiosabiFlags() const;
+  std::vector<SectionHeader> getSectionHeaders() const;
 
+  // flags/machine are "bytes to string" mapping 
+  // that will represent specific bytes values and their
+  // meaning in a human readable string.
   enum flags { ETYPE = 0,
                EMACHINE = 1,
                ECLASS,
@@ -147,14 +151,12 @@ class ELF {
   enum machine {EM_X86_64 = 50, EM_ARM = 41, EM_386 = 3  };
 
  private:
-  // Elfxx_Ehdr
   uint32_t magicBytes_u32;
   unsigned char e_ident[16];
   uint8_t ei_class_u8;
   uint8_t ei_data_u8;
   uint8_t ei_version_u8;
   uint8_t ei_osabi_u8;
-
   uint16_t e_type_u16;
   uint16_t e_machine_u16;
   uint32_t e_version_u32;

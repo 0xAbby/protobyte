@@ -2,7 +2,7 @@
  * @file mach_o-test.h
  * @brief  definitions and unit tests for Mach-O format.
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
@@ -13,11 +13,15 @@
 #include <gtest/gtest.h>
 #include "../headers.h"
 
+/**
+ * @brief A class holding definitions for Mach-O related tests.
+ *
+ * */
 class MACHO_Test : public testing::Test {
 public:
     MACHO mach_o;
     MACHO_Test() {
-        mach_o.init("../../samples/mach-o/MachO-OSX-x64-ls");
+        mach_o.init("samples/mach-o/MachO-OSX-x64-ls");
     }
     ~MACHO_Test() {
     }

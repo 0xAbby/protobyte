@@ -2,17 +2,18 @@
  * @file file_io.cpp
  * @brief  Methods used for read/write operations on a given file
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
-#include "headers.h"
+#include "../headers.h"
 
 FileIO::FileIO() {}
 FileIO::~FileIO() {}
 
 /**
  * @brief A method to print out parsed information from a class object.
+ * if file can't be read, an exception is thrown with proper message.
  *
  * @param fileObject A class object that will be either PE, ELF or MACHO, based
  * on the type the method will continue printing relevant information.
@@ -20,7 +21,7 @@ FileIO::~FileIO() {}
  * @return none.
  */
 FileIO::FileIO(std::string filename) {
-  uint32_t bytes = fileID(filename);
+  uint32_t bytes = getMagicBytes(filename);
 
   if (uint16_t(bytes) == PE_FILE) {
     PE pe;
@@ -36,6 +37,8 @@ FileIO::FileIO(std::string filename) {
     printMachO(mach_o);
   } else if (bytes == MACHO_FAT_FILE || bytes == MACHO_FAT_CIGAM_FILE) {
 
+  } else {
+    throw std::runtime_error("Could not read magic bytes");
   }
 }
 
@@ -174,11 +177,19 @@ uint64_t FileIO::read_u64(std::ifstream& in, bool littleEnd) {
   return value;
 }
 
-uint32_t FileIO::fileID(std::string filename) const{
+/**
+ * @brief Reads first 4 bytes as little endian byte order.
+ *
+ * @param filename An std::string object containing filename to be read.
+ *
+ * @return 4 bytes read from the beginning of the file. or 1 if it fails.
+ */
+uint32_t FileIO::getMagicBytes(std::string filename) const{
   using namespace std;
   ifstream file(filename, ios::binary);
   if (file.fail()) {
     cout << "Error, cant find file." << endl;
+    return 1;
   }
   uint32_t bytes = read_u32(file, true);
   file.close();

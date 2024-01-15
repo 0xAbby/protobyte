@@ -2,12 +2,12 @@
  * @file elf.cpp
  * @brief  Implementations for functions that deal with ELF file format.
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
 
-#include "headers.h"
+#include "../headers.h"
 
 ELF::ELF() {}
 ELF::~ELF() {}
@@ -215,7 +215,7 @@ void ELF::parse32(std::ifstream& file, bool littleEndian) {
   * program headers size:
   *            in 32bit: 32 byte long (n) arrays
   *            in 64bit: 56 byte long (n) arrays
-  * @ref https://wiki.osdev.org/ELF#Header
+  * ref https://wiki.osdev.org/ELF#Header
   */
 
   for(uint32_t idx = 0; idx < e_phnum_u16; idx++) {
@@ -305,7 +305,7 @@ void ELF::parse64(std::ifstream& file, bool littleEndian) {
   * program headers size:
   *            in 32bit: 32 byte long (n) arrays
   *            in 64bit: 56 byte long (n) arrays
-  * @ref https://wiki.osdev.org/ELF#Header
+  * ref https://wiki.osdev.org/ELF#Header
   */
 
   for(uint32_t idx = 0; idx < e_phnum_u16; idx++) {
@@ -426,7 +426,7 @@ uint32_t ELF::getMagicBytes() const {
 
 /**
  * @brief Returns ELF's ei_class byte.
- *
+ * @param none
  * @return ELF's ei_class byte value.
  */
 uint16_t ELF::getEi_class() const {
@@ -435,15 +435,15 @@ uint16_t ELF::getEi_class() const {
 
 /**
  * @brief Returns ELF's ei_data byte.
- *
-  */
+ * @param none
+*/
 uint16_t ELF::getEi_data() const {
   return this->ei_data_u8;
 }
 
 /**
  * @brief Returns ELF's ei_osabi byte.
- *
+ * @param none
   */
 uint16_t ELF::getEi_osabi() const {
   return this->ei_osabi_u8;
@@ -451,7 +451,7 @@ uint16_t ELF::getEi_osabi() const {
 
 /**
  * @brief Returns ELF's e_class flag bytes.
- *
+ * @param none
  */
 std::map<uint16_t, std::string> ELF::getEclassFlags() const {
   return this->eclassFlags; 
@@ -459,7 +459,7 @@ std::map<uint16_t, std::string> ELF::getEclassFlags() const {
 
 /**
  * @brief Returns ELF's e_data flag bytes.
- *
+ * @param none
  */
 std::map<uint16_t, std::string> ELF::getEdataFlags() const {
   return this->edataFlags;
@@ -467,7 +467,7 @@ std::map<uint16_t, std::string> ELF::getEdataFlags() const {
 
 /**
  * @brief Returns ELF's magic bytes.
- *
+ * @param none
  */
 std::map<uint16_t, std::string> ELF::getEiosabiFlags() const {
   return this->eiosabiFlags; 
@@ -475,7 +475,7 @@ std::map<uint16_t, std::string> ELF::getEiosabiFlags() const {
 
 /**
  * @brief Returns ELF's e_type flag bytes.
- *
+ * @param none
  */
 std::map<uint16_t, std::string> ELF::getEtypeFlags() const {
   return this->etypeFlags;
@@ -483,12 +483,21 @@ std::map<uint16_t, std::string> ELF::getEtypeFlags() const {
 
 /**
  * @brief Returns ELF's e_machine flag bytes.
- *
+ * @param none
  */
 std::map<uint16_t, std::string> ELF::getEmachineFlags() const {
   return this->emachineFlags;
 }
 
+/**
+ * @brief Prints ELF's flag representation as a string to output.
+ *
+ * @param flag The ELF flag type to resolve (e.i. E_class, e_data...etc).
+ * @param type The flag value, can be zero sometimes, or the value to be retrived
+ * from the mapped strings in function mapFlags().
+ * 
+ * @return none.
+ */
 void ELF::printFlag(uint32_t flag, uint32_t type) {
   if (flag == ECLASS)
       std::cout << this->eclassFlags[ei_class_u8] << std::endl;
@@ -510,6 +519,11 @@ void ELF::printFlag(uint32_t flag, uint32_t type) {
       std::cout << this->programHeaderType_m[type] << std::endl;
 }
 
+/**
+ * @brief Prints an ELF file's parsed information.
+ * @param none
+ * @return none
+ */
 void ELF::printElf() {
   using namespace std;
   cout << "Magic bytes: \t0x" << uppercase << hex << this->getMagicBytes() << " | ";
@@ -565,23 +579,60 @@ void ELF::printElf() {
   }
 }
 
+/**
+ * @brief Returns an ELF's section header offset value.
+ * @param none
+ * @return 64 bits unsigned int.
+ */
 uint64_t ELF::getE_shoff() {
   return this->e_shoff_u64;
 }
 
+/**
+ * @brief Returns an ELF's program header size value.
+ * @param none
+ * @return 16 bits unsigned int.
+ */
 uint16_t ELF::getE_phentsize() {
   return this->e_phentsize_u16;
 }
+
+/**
+ * @brief Returns an ELF's number of program headers value.
+ * @param none
+ * @return 16 bits unsigned int.
+ */
 uint16_t ELF::getE_phnum() {
   return this->e_phnum_u16;
 }
+
+/**
+ * @brief Returns an ELF's section header size value.
+ * @param none
+ * @return 16 bits unsigned int.
+ */
 uint16_t ELF::getE_shentsize() {
   return this->e_shentsize_u16;
 }
+
+/**
+ * @brief Returns an ELF's number of section headers value.
+ * @param none
+ * @return 16 bits unsigned int.
+ */
 uint16_t ELF::getE_shnum() {
   return this->e_shnum_u16;
 }
 
+/**
+ * @brief Returns the name of a section header.
+ * 
+ * @param nameOffset The offset in a file of where to read the name.
+ * @param tableIndx The index of a section header that will contain an array of string names.
+ * @param file A ifstream file object that is already opened for reading in binary.
+ * 
+ * @return a string object of type std::string.
+ */
 std::string ELF::getSectionHeaderName(uint32_t nameOffset, uint32_t tableIndx, std::ifstream& file) {
   // loop over vector of sections
   // if s_name and e_shntndex isn't zero
@@ -608,55 +659,170 @@ std::string ELF::getSectionHeaderName(uint32_t nameOffset, uint32_t tableIndx, s
       return name;
 }
 
+std::vector<SectionHeader> ELF::getSectionHeaders() const {
+  return this->sectionHeader;
+}
 
 /************************ program headers ********************/
 
+/**
+ * @brief Sets the type of a program header section.
+ * 
+ * @param value The 4 bytes value to be set
+ * 
+ * @return None.
+ */
 void ProgramHeader::setP_type(uint32_t value) {
   this->p_type_u32 = value;
 }
+
+/**
+ * @brief Sets the flags of a program header section.
+ * 
+ * @param value The 4 bytes value to be set
+ * 
+ * @return None.
+ */
 void ProgramHeader::setP_flags(uint32_t value) {
   this->p_flags_u32 = value;
 }
+
+/**
+ * @brief Sets the offset of a program header section.
+ * 
+ * @param value The 64bit value to be set
+ * 
+ * @return None.
+ */
 void ProgramHeader::setP_offset(uint64_t value) {
   this->p_offset_u64 = value;
 }
+
+/**
+ * @brief Sets the virtual address of a program header section.
+ * 
+ * @param value The 64bits value to be set
+ * 
+ * @return None.
+ */
 void ProgramHeader::setP_vaddr(uint64_t value) {
   this->p_vaddr_u64 = value;
 }
+
+/**
+ * @brief Sets the physical address of a program header section.
+ * 
+ * @param value The 64bits value to be set
+ * 
+ * @return None.
+ */
 void ProgramHeader::setP_paddr(uint64_t value) {
   this->p_paddr_u64 = value;
 }
+
+/**
+ * @brief Sets the filesz field of a program header section.
+ * 
+ * @param value The 64bits value to be set
+ * 
+ * @return None.
+ */
 void ProgramHeader::setP_filesz(uint64_t value) {
   this->p_filesz_u64 = value;
 }
+
+/**
+ * @brief Sets the memsz field of a program header section.
+ * 
+ * @param value The 64bits value to be set
+ * 
+ * @return None.
+ */
 void ProgramHeader::setP_memsz(uint64_t value) {
     this->p_memsz_u64 = value;
 }
+
+/**
+ * @brief Sets the alignment field of a program header section.
+ * 
+ * @param value The 64bits value to be set
+ * 
+ * @return None.
+ */
 void ProgramHeader::setP_align(uint64_t value) {
     this->p_align_u64 = value;
 }
 
+/**
+ * @brief Gets the value of 'type' field in a program header section.
+ * 
+ * @param value The 4 bytes value to be set
+ * 
+ * @return None.
+ */
 uint32_t ProgramHeader::getP_type() {
   return this->p_type_u32;
 }
+
+/**
+ * @brief Gets the value of 'flags' field in a program header section.
+ * 
+ * @return The 4 bytes value to be set
+ */
 uint32_t ProgramHeader::getP_flags() {
   return this->p_flags_u32;  
 }
+
+/**
+ * @brief Gets the value of 'offset' field in a program header section.
+ * 
+ * @return The 8 bytes value to be set
+ */
 uint64_t ProgramHeader::getP_offset() {
   return this->p_offset_u64;
 }
+
+/**
+ * @brief Gets the value of 'virtual address' field in a program header section.
+ * 
+ * @return The 8 bytes value to be set
+ */
 uint64_t ProgramHeader::getP_vaddr() {
   return this->p_vaddr_u64;  
 }
+
+/**
+ * @brief Gets the value of 'physical address' field in a program header section.
+ * 
+ * @return The 8 bytes value to be set
+ */
 uint64_t ProgramHeader::getP_paddr() {
   return this->p_paddr_u64;  
 }
+
+/**
+ * @brief Gets the value of 'filesz' field in a program header section.
+ * 
+ * @return The 8 bytes value to be set
+ */
 uint64_t ProgramHeader::getP_filesz() {
   return this->p_filesz_u64;  
 }
+
+/**
+ * @brief Gets the value of 'memsz' field in a program header section.
+ * 
+ * @return The 8 bytes value to be set
+ */
 uint64_t ProgramHeader::getP_memsz() {
   return this->p_memsz_u64;  
 }
+
+/**
+ * @brief Gets the value of 'alignment' field in a program header section.
+ * 
+ * @return The 8 bytes value to be set
+ */
 uint64_t ProgramHeader::getP_align() {
   return this->p_align_u64;
 }
@@ -723,9 +889,22 @@ uint32_t SectionHeader::getSh_entsize() {
   return this->sh_entsize_u64;
 }
 
+/**
+ * @brief Sets a section header's name.
+ * 
+ * @param name a string object containing the name.
+ * 
+ * @return None.
+ */
 void SectionHeader::setSh_name(std::string name) {
   this->name = name;
 }
+
+/**
+ * @brief Gets the name of a section header.
+ * 
+ * @return A string object containing the name of section header
+ */
 std::string SectionHeader::getS_name() {
   return this->name;
 }

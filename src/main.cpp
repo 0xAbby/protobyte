@@ -2,7 +2,7 @@
  * @file main.cpp
  * @brief  binlyzer, a program for reading an executable's header info.
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */

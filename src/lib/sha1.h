@@ -1,22 +1,18 @@
-/*
-    sha1.hpp - source code of
-
-    ============
-    SHA-1 in C++
-    ============
+/**
+    sha1.h:
+        Functions defintions for the SHA1 hashing algorithm.
 
     100% Public Domain.
-
     Original C Code
-        -- Steve Reid <steve@edmweb.com>
+        @author Steve Reid <steve@edmweb.com>
     Small changes to fit into bglibs
-        -- Bruce Guenter <bruce@untroubled.org>
+        @author Bruce Guenter <bruce@untroubled.org>
     Translation to simpler C++ Code
-        -- Volker Diels-Grabsch <v@njh.eu>
+        @author Volker Diels-Grabsch <v@njh.eu>
     Safety fixes
-        -- Eugene Hopkinson <slowriot at voxelstorm dot com>
+        @author Eugene Hopkinson <slowriot at voxelstorm dot com>
     Header-only library
-        -- Zlatko Michailov <zlatko@michailov.org>
+        @author Zlatko Michailov <zlatko@michailov.org>
 */
 #ifndef SHA1_H
 #define SHA1_H

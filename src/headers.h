@@ -1,7 +1,7 @@
 /**
  * @file headers.h
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
@@ -20,9 +20,9 @@
 #include <cstdint>
 #include <cstring>
 
-#include "file_io.h"
-#include "pe.h"
-#include "elf.h"
-#include "macho.h"
+#include "lib/file_io.h"
+#include "lib/pe.h"
+#include "lib/elf.h"
+#include "lib/macho.h"
 
 #endif

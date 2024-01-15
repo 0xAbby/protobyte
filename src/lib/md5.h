@@ -1,3 +1,7 @@
+/**
+ * md5.h: 
+ * @brief  Function definitions for MD5 hashing algorithm.
+ */
 #ifndef MD5_H
 #define MD5_H
 
@@ -39,12 +43,12 @@ struct MD5HasherContext
   unsigned char in[64];
 };
 
-/* Creating a namespace for these functions */
-class MD5Hasher
-{
+/** 
+ * @brief Creating a namespace for these functions 
+ * */
+class MD5Hasher {
 public:
-  MD5Hasher()
-  {
+  MD5Hasher() {
     memset(&this->ctx, 0, sizeof(this->ctx));
   }
   ~MD5Hasher() {}
@@ -57,7 +61,6 @@ public:
 
 private:
   struct MD5HasherContext ctx;
-
   void MD5Transform(uint32 buf[4], uint32 in[16]);
 };
 
@@ -65,4 +68,4 @@ private:
     byte order and uint32 settings.  */
 #define CHECK_HARDWARE_PROPERTIES
 
-#endif /* !MD5_H */
+#endif

@@ -3,11 +3,11 @@
  * @brief  Implements functions that deals with PE structures
  *        read and save information in a PE class object members.
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref  https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
-#include "headers.h"
+#include "../headers.h"
 
 PE::PE() {}
 PE::~PE() {}

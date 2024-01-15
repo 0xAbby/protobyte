@@ -1,7 +1,4 @@
-unit_test/runTests
+unit_test/
 binlyzer
-build/file_io.o
-build/pe.o
-build/macho.o
-build/elf.o
+build/
 .vscode

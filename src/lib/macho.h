@@ -2,15 +2,18 @@
  * @file macho.h
  * @brief  Definitions and declarations for Mach-O module
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref  https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
 #ifndef MACHO_H
 #define MACHO_H
 
-#include "headers.h"
+#include "../headers.h"
 
+/**
+ * @brief Definitions for sections in Mach-O files.
+*/
 class MachOSection {
  public:
  private:
@@ -74,7 +77,7 @@ class LoadCommand {
  * @brief holds information for Mach_o file format, carries out Mach-O specific
  * operations, loading, reading displaying header info.
  * @see https://en.wikipedia.org/wiki/Mach-O
- * @see https://developer.apple.com/library/archive/documentation/Performance\
+ * @see https://developer.apple.com/library/archive/documentation/Performance
  * /Conceptual/CodeFootprint/Articles/MachOOverview.html
  * @see https://github.com/aidansteele/osx-abi-macho-file-format-reference
  */

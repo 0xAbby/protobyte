@@ -3,12 +3,12 @@
  * @brief  Implements functions that deals with Mach-O structures
  *        read and save information in a MACHO class object members.
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
 
-#include "headers.h"
+#include "../headers.h"
 
 /**
  * @brief constructor for PE class objects that helps with starting parsing operation.
@@ -41,8 +41,8 @@ void MACHO::init(std::string filename) {
 
 void MACHO::parseUniMacho(std::ifstream& file) {
 
-
 }
+
 /*** 
  * @brief parses x86 Mach-O format (32 and 64 bit).
  * @param file an ifstream object file, with the file already opened and set at offset 4
@@ -224,10 +224,16 @@ uint32_t MACHO::getSizeOfLoadCommand() const {
   return this->sizeOfLoadCommand_u32;
 }
 
+/**
+ * @brief Returns an vector of LoadCommands read in a given Mach-O file.
+*/
 std::vector<LoadCommand> MACHO::getLoadCommand() const {
   return this->loadCommand;
 }
 
+/**
+ * @brief Maps bytes definition of flags to specific text strings.
+*/
 void MACHO::mapFlagDefinitions() {
   using namespace std;
 
@@ -330,9 +336,16 @@ void MACHO::mapFlagDefinitions() {
   loadCommandType_m.insert(pair<uint32_t, string> (0x32, "LC_BUILD_VERSION"));
   loadCommandType_m.insert(pair<uint32_t, string> (0x33, "LC_DYLD_EXPORTS_TRIE"));
   loadCommandType_m.insert(pair<uint32_t, string> (0x34, "LC_DYLD_CHAINED_FIXUPS"));
-
 }
 
+/**
+ * @brief Prints string information of flag bytes, based on its type or value.
+ * 
+ * @param flag A value indicating the type of mapped flag to be read.
+ * @param value A value of specific mapped item to be read and printed.
+ * 
+ * @return None.
+*/
 void MACHO::printFlag(uint32_t flag, uint32_t value) {
     if (flag == magictypes)
       std::cout << magicMap_m[magicBytes_u32] << std::endl;
@@ -346,6 +359,9 @@ void MACHO::printFlag(uint32_t flag, uint32_t value) {
       std::cout << this->loadCommandType_m[value] << std::endl;
 }
 
+/**
+ * @brief Prints information read from a Mach-O file.
+*/
 void MACHO::printMach() {
   using namespace std;
 

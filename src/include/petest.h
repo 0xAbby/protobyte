@@ -2,7 +2,7 @@
  * @file petest.h
  * @brief  definitions and unit tests for PE format.
  *
- *  https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/binlyzer
  *
  * @author Abdullah Ada
  */
@@ -13,10 +13,14 @@
 #include <gtest/gtest.h>
 #include "../headers.h"
 
+/**
+ * @brief A class holding definitions for PE related tests.
+ *
+ * */
 class PETest : public testing::Test {
  public:
   PE pe;
-  PETest() { pe.init("../../samples/pe/dbghelp.dll"); }
+  PETest() { pe.init("samples/pe/dbghelp.dll"); }
   ~PETest() {}
 };
 
