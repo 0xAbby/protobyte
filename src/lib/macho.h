@@ -90,9 +90,9 @@ class MACHO {
 
   MACHO();
   virtual ~MACHO();
-  MACHO(std::string);
+  MACHO(const std::string&);
 
-  void init(std::string);
+  void init(const std::string&);
   void parseX86_macho(std::ifstream&);
   void parseUniMacho(std::ifstream&);
 

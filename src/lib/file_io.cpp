@@ -184,7 +184,7 @@ uint64_t FileIO::read_u64(std::ifstream& in, bool littleEnd) {
  *
  * @return 4 bytes read from the beginning of the file. or 1 if it fails.
  */
-uint32_t FileIO::getMagicBytes(std::string filename) const{
+uint32_t FileIO::getMagicBytes(const std::string& filename) const{
   using namespace std;
   ifstream file(filename, ios::binary);
   if (file.fail()) {

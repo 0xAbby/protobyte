@@ -33,7 +33,7 @@ inline static void reset(uint32_t digest[],
   digest[4] = 0xc3d2e1f0;
 
   /* Reset counters */
-  buffer = "";
+  buffer.clear();
   transforms = 0;
 }
 

@@ -20,8 +20,8 @@
 class PETest : public testing::Test {
  public:
   PE pe;
-  PETest() { pe.init("samples/pe/dbghelp.dll"); }
-  ~PETest() {}
+  PETest() { pe.init("../samples/pe/dbghelp.dll"); }
+  ~PETest() =default;
 };
 
 TEST_F(PETest, DosHeader) {

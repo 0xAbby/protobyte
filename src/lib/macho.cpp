@@ -17,7 +17,7 @@
  *
  * @return none.
  */
-MACHO::MACHO(std::string filename) {
+MACHO::MACHO(const std::string& filename) {
   //init(filename);
 }
 
@@ -28,7 +28,7 @@ MACHO::MACHO(std::string filename) {
  *
  * @return none.
  */
-void MACHO::init(std::string filename) {
+void MACHO::init(const std::string& filename) {
   std::ifstream file(filename, std::ios::binary);
   magicBytes_u32 = FileIO::read_u32(file, true);
 
@@ -237,105 +237,105 @@ std::vector<LoadCommand> MACHO::getLoadCommand() const {
 void MACHO::mapFlagDefinitions() {
   using namespace std;
 
-  magicMap_m.insert(pair<uint32_t, string> (0xFEEDFACE, "MACHO_32"));
-  magicMap_m.insert(pair<uint32_t, string> (0xFEEDFACF, "MACHO_64"));
-  magicMap_m.insert(pair<uint32_t, string> (0xCAFEBABE, "MACHO_FAT"));
-  magicMap_m.insert(pair<uint32_t, string> (0xBEBAFECA, "MACHO_FAT_CIGAM"));
+  magicMap_m.try_emplace(0xFEEDFACE, "MACHO_32");
+  magicMap_m.try_emplace(0xFEEDFACF, "MACHO_64");
+  magicMap_m.try_emplace(0xCAFEBABE, "MACHO_FAT");
+  magicMap_m.try_emplace(0xBEBAFECA, "MACHO_FAT_CIGAM");
 
-  cputType_m.insert(pair<uint32_t, string> (0x07, "CPU_TYPE_X86"));
-  cputType_m.insert(pair<uint32_t, string> (0x01000007, "CPU_TYPE_X64"));
-  cputType_m.insert(pair<uint32_t, string> (0x0C, "CPU_TYPE_ARM"));
-  cputType_m.insert(pair<uint32_t, string> (0x0100000C, "CPU_TYPE_ARM64"));
-  cputType_m.insert(pair<uint32_t, string> (0x12, "CPU_TYPE_PPC"));
+  cputType_m.try_emplace(0x07, "CPU_TYPE_X86");
+  cputType_m.try_emplace(0x01000007, "CPU_TYPE_X64");
+  cputType_m.try_emplace(0x0C, "CPU_TYPE_ARM");
+  cputType_m.try_emplace(0x0100000C, "CPU_TYPE_ARM64");
+  cputType_m.try_emplace(0x12, "CPU_TYPE_PPC");
   
-  headerFileType_m.insert(pair<uint32_t, string> (0x1, "MACH_OBJECT"));
-  headerFileType_m.insert(pair<uint32_t, string> (0x2, "MACH_EXECUTE"));
-  headerFileType_m.insert(pair<uint32_t, string> (0x3, "MACH_FVMLIB"));
-  headerFileType_m.insert(pair<uint32_t, string> (0x4, "MACH_CORE"));
-  headerFileType_m.insert(pair<uint32_t, string> (0x5, "MACH_PRELOAD"));
-  headerFileType_m.insert(pair<uint32_t, string> (0x6, "MACH_DYLIB"));
-  headerFileType_m.insert(pair<uint32_t, string> (0x7, "MACH_DYLINKER"));
-  headerFileType_m.insert(pair<uint32_t, string> (0x8, "MACH_BUNDLE"));
-  headerFileType_m.insert(pair<uint32_t, string> (0x9, "MACH_DYLIB_STUB"));
-  headerFileType_m.insert(pair<uint32_t, string> (0xA, "MACH_DSYM"));
-  headerFileType_m.insert(pair<uint32_t, string> (0xB, "MACH_KEXT_BUNDLE"));
+  headerFileType_m.try_emplace(0x1, "MACH_OBJECT");
+  headerFileType_m.try_emplace(0x2, "MACH_EXECUTE");
+  headerFileType_m.try_emplace(0x3, "MACH_FVMLIB");
+  headerFileType_m.try_emplace(0x4, "MACH_CORE");
+  headerFileType_m.try_emplace(0x5, "MACH_PRELOAD");
+  headerFileType_m.try_emplace(0x6, "MACH_DYLIB");
+  headerFileType_m.try_emplace(0x7, "MACH_DYLINKER");
+  headerFileType_m.try_emplace(0x8, "MACH_BUNDLE");
+  headerFileType_m.try_emplace(0x9, "MACH_DYLIB_STUB");
+  headerFileType_m.try_emplace(0xA, "MACH_DSYM");
+  headerFileType_m.try_emplace(0xB, "MACH_KEXT_BUNDLE");
 
-  headerFlags_m.insert(pair<uint32_t, string> (0x1, "MACH_NOUNDEFS"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x2, "MACH_INCRLINK"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x4, "MACH_DYLDLINK"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x8, "MACH_BINDATLOAD"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x10, "MACH_PREBOUND"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x20, "MACH_SPLIT_SEGS"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x40, "MACH_LAZY_INIT"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x80, "MACH_TWOLEVEL"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x100, "MACH_FORCE_FLAT"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x200, "MACH_NOMULTIDEFS"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x400, "MACH_NOFIXPREBINDING"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x800, "MACH_PREBINDABLE"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x1000, "MACH_ALLMODSBOUND"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x2000, "MACH_SUBSECTIONS_VIA_SYMBOLS"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x4000, "MACH_CANONICAL"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x8000, "MACH_WEAK_DEFINES"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x10000, "MACH_BINDS_TO_WEAK"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x20000, "MACH_ALLOW_STACK_EXECUTION"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x40000, "MACH_ROOT_SAFE"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x80000, "MACH_SETUID_SAFE"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x100000, "MACH_NO_REEXPORTED_DYLIBS"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x200000, "MACH_PIE"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x400000, "MACH_DEAD_STRIPPABLE_DYLIB"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x800000, "MACH_HAS_TLV_DESCRIPTORS"));
-  headerFlags_m.insert(pair<uint32_t, string> (0x1000000, "MACH_NO_HEAP_EXECUTION"));
+  headerFlags_m.try_emplace(0x1, "MACH_NOUNDEFS");
+  headerFlags_m.try_emplace(0x2, "MACH_INCRLINK");
+  headerFlags_m.try_emplace(0x4, "MACH_DYLDLINK");
+  headerFlags_m.try_emplace(0x8, "MACH_BINDATLOAD");
+  headerFlags_m.try_emplace(0x10, "MACH_PREBOUND");
+  headerFlags_m.try_emplace(0x20, "MACH_SPLIT_SEGS");
+  headerFlags_m.try_emplace(0x40, "MACH_LAZY_INIT");
+  headerFlags_m.try_emplace(0x80, "MACH_TWOLEVEL");
+  headerFlags_m.try_emplace(0x100, "MACH_FORCE_FLAT");
+  headerFlags_m.try_emplace(0x200, "MACH_NOMULTIDEFS");
+  headerFlags_m.try_emplace(0x400, "MACH_NOFIXPREBINDING");
+  headerFlags_m.try_emplace(0x800, "MACH_PREBINDABLE");
+  headerFlags_m.try_emplace(0x1000, "MACH_ALLMODSBOUND");
+  headerFlags_m.try_emplace(0x2000, "MACH_SUBSECTIONS_VIA_SYMBOLS");
+  headerFlags_m.try_emplace(0x4000, "MACH_CANONICAL");
+  headerFlags_m.try_emplace(0x8000, "MACH_WEAK_DEFINES");
+  headerFlags_m.try_emplace(0x10000, "MACH_BINDS_TO_WEAK");
+  headerFlags_m.try_emplace(0x20000, "MACH_ALLOW_STACK_EXECUTION");
+  headerFlags_m.try_emplace(0x40000, "MACH_ROOT_SAFE");
+  headerFlags_m.try_emplace(0x80000, "MACH_SETUID_SAFE");
+  headerFlags_m.try_emplace(0x100000, "MACH_NO_REEXPORTED_DYLIBS");
+  headerFlags_m.try_emplace(0x200000, "MACH_PIE");
+  headerFlags_m.try_emplace(0x400000, "MACH_DEAD_STRIPPABLE_DYLIB");
+  headerFlags_m.try_emplace(0x800000, "MACH_HAS_TLV_DESCRIPTORS");
+  headerFlags_m.try_emplace(0x1000000, "MACH_NO_HEAP_EXECUTION");
   
 
-  loadCommandType_m.insert(pair<uint32_t, string> (0x1, "SEGMENT"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x2, "SYM_TAB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x3, "SYM_SEG"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x4, "THREAD"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x5, "UNIX_THREAD"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x6, "LOAD_FVM_LIB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x7, "ID_FVM_LIB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x8, "IDENT"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x9, "FVM_FILE"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0xA, "PREPAGE"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0xB, "DY_SYM_TAB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0xC, "LOAD_DYLIB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0xD, "ID_DYLIB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0xE, "LOAD_DYLINKER"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0xF, "ID_DYLINKER"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x10, "PREBOUND_DYLIB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x11, "ROUTINES"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x12, "SUB_FRAMEWORK"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x13, "SUB_UMBRELLA"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x14, "SUB_CLIENT"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x15, "SUB_LIBRARY"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x16, "TWOLEVEL_HINTS"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x17, "PREBIND_CKSUM"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x18, "LOAD_WEAK_DYLIB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x19, "SEGMENT_64"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x1A, "ROUTINES_64"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x1B, "UUID"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x1C, "RPATH"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x1D, "CODE_SIGNATURE"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x1E, "SEGMENT_SPLIT_INFO"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x1F, "REEXPORT_DYLIB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x20, "LAZY_LOAD_DYLIB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x21, "ENCRYPTION_INFO"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x22, "DYLD_INFO"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x22, "DYLD_INFO_ONLY"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x23, "LOAD_UPWARD_DYLIB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x24, "VERSION_MIN_MAC_OSX"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x25, "VERSION_MIN_IPHONE_OS"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x26, "FUNCTION_STARTS"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x27, "DYLD_ENVIRONMENT"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x28, "MAIN"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x28, "MAIN_DYLIB"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x29, "DATA_IN_CODE"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x2A, "SOURCE_VERSION"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x2B, "DYLIB_CODE_SIGN_DRS"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x2c, "ENCRYPTION_INFO_64"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x32, "LC_BUILD_VERSION"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x33, "LC_DYLD_EXPORTS_TRIE"));
-  loadCommandType_m.insert(pair<uint32_t, string> (0x34, "LC_DYLD_CHAINED_FIXUPS"));
+  loadCommandType_m.try_emplace(0x1, "SEGMENT");
+  loadCommandType_m.try_emplace(0x2, "SYM_TAB");
+  loadCommandType_m.try_emplace(0x3, "SYM_SEG");
+  loadCommandType_m.try_emplace(0x4, "THREAD");
+  loadCommandType_m.try_emplace(0x5, "UNIX_THREAD");
+  loadCommandType_m.try_emplace(0x6, "LOAD_FVM_LIB");
+  loadCommandType_m.try_emplace(0x7, "ID_FVM_LIB");
+  loadCommandType_m.try_emplace(0x8, "IDENT");
+  loadCommandType_m.try_emplace(0x9, "FVM_FILE");
+  loadCommandType_m.try_emplace(0xA, "PREPAGE");
+  loadCommandType_m.try_emplace(0xB, "DY_SYM_TAB");
+  loadCommandType_m.try_emplace(0xC, "LOAD_DYLIB");
+  loadCommandType_m.try_emplace(0xD, "ID_DYLIB");
+  loadCommandType_m.try_emplace(0xE, "LOAD_DYLINKER");
+  loadCommandType_m.try_emplace(0xF, "ID_DYLINKER");
+  loadCommandType_m.try_emplace(0x10, "PREBOUND_DYLIB");
+  loadCommandType_m.try_emplace(0x11, "ROUTINES");
+  loadCommandType_m.try_emplace(0x12, "SUB_FRAMEWORK");
+  loadCommandType_m.try_emplace(0x13, "SUB_UMBRELLA");
+  loadCommandType_m.try_emplace(0x14, "SUB_CLIENT");
+  loadCommandType_m.try_emplace(0x15, "SUB_LIBRARY");
+  loadCommandType_m.try_emplace(0x16, "TWOLEVEL_HINTS");
+  loadCommandType_m.try_emplace(0x17, "PREBIND_CKSUM");
+  loadCommandType_m.try_emplace(0x18, "LOAD_WEAK_DYLIB");
+  loadCommandType_m.try_emplace(0x19, "SEGMENT_64");
+  loadCommandType_m.try_emplace(0x1A, "ROUTINES_64");
+  loadCommandType_m.try_emplace(0x1B, "UUID");
+  loadCommandType_m.try_emplace(0x1C, "RPATH");
+  loadCommandType_m.try_emplace(0x1D, "CODE_SIGNATURE");
+  loadCommandType_m.try_emplace(0x1E, "SEGMENT_SPLIT_INFO");
+  loadCommandType_m.try_emplace(0x1F, "REEXPORT_DYLIB");
+  loadCommandType_m.try_emplace(0x20, "LAZY_LOAD_DYLIB");
+  loadCommandType_m.try_emplace(0x21, "ENCRYPTION_INFO");
+  loadCommandType_m.try_emplace(0x22, "DYLD_INFO");
+  loadCommandType_m.try_emplace(0x22, "DYLD_INFO_ONLY");
+  loadCommandType_m.try_emplace(0x23, "LOAD_UPWARD_DYLIB");
+  loadCommandType_m.try_emplace(0x24, "VERSION_MIN_MAC_OSX");
+  loadCommandType_m.try_emplace(0x25, "VERSION_MIN_IPHONE_OS");
+  loadCommandType_m.try_emplace(0x26, "FUNCTION_STARTS");
+  loadCommandType_m.try_emplace(0x27, "DYLD_ENVIRONMENT");
+  loadCommandType_m.try_emplace(0x28, "MAIN");
+  loadCommandType_m.try_emplace(0x28, "MAIN_DYLIB");
+  loadCommandType_m.try_emplace(0x29, "DATA_IN_CODE");
+  loadCommandType_m.try_emplace(0x2A, "SOURCE_VERSION");
+  loadCommandType_m.try_emplace(0x2B, "DYLIB_CODE_SIGN_DRS");
+  loadCommandType_m.try_emplace(0x2c, "ENCRYPTION_INFO_64");
+  loadCommandType_m.try_emplace(0x32, "LC_BUILD_VERSION");
+  loadCommandType_m.try_emplace(0x33, "LC_DYLD_EXPORTS_TRIE");
+  loadCommandType_m.try_emplace(0x34, "LC_DYLD_CHAINED_FIXUPS");
 }
 
 /**

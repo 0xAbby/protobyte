@@ -51,7 +51,7 @@ public:
   MD5Hasher() {
     memset(&this->ctx, 0, sizeof(this->ctx));
   }
-  ~MD5Hasher() {}
+  ~MD5Hasher() =default;
 
   void MD5Init();
   void MD5Update(unsigned char *buf, unsigned len);

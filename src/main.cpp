@@ -11,8 +11,8 @@
 int main(int argc, char* argv[]) {
   try {
     if (argc < 2) {
-      printf("please supply at least One valid PE file\n");
-      exit(1);
+      std::cout << "please supply at least One valid PE file\n";
+      return -1;
     }
     FileIO file(argv[1]);
   }

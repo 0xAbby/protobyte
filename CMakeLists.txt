@@ -19,6 +19,8 @@ file(GLOB BUILD_SOURCES
     "src/lib/*.cpp"
     "src/lib/*.h")
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) 
+
 add_executable(binlyzer "src/main.cpp" 
                         ${BUILD_SOURCES})
 

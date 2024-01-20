@@ -32,7 +32,7 @@ class FileIO {
 
   void printPE(PE&) const;
   void printELF(ELF&) const;
-  uint32_t getMagicBytes(std::string) const;
+  uint32_t getMagicBytes(const std::string&) const;
   void printMachO(MACHO&) const;
 
   enum fileType { MACHO_32_FILE = 0xFEEDFACE, 

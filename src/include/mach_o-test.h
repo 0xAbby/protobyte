@@ -21,10 +21,9 @@ class MACHO_Test : public testing::Test {
 public:
     MACHO mach_o;
     MACHO_Test() {
-        mach_o.init("samples/mach-o/MachO-OSX-x64-ls");
+        mach_o.init("../samples/mach-o/MachO-OSX-x64-ls");
     }
-    ~MACHO_Test() {
-    }
+    ~MACHO_Test() =default;
 };
 
 

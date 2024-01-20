@@ -18,7 +18,7 @@
 class SectionHeader {
   public:
     void setSh_name(uint32_t);
-    void setSh_name(std::string);
+    void setSh_name(std::string&);
     void setSh_type(uint32_t);
     void setSh_flags(uint32_t);
     void setSh_addr(uint32_t);

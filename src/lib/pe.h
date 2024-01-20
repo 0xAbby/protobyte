@@ -1,4 +1,4 @@
-/**
+ /**
  * @file pe.h
  * @brief  Definitions and declarations for PE module, Dos header, PE header,
  * sections, and directories.
@@ -16,14 +16,15 @@
 #define OPTIONAL_IMAGE_PE32 0x10b
 #define OPTIONAL_IMAGE_PE32_plus 0x20b
 
+ 
 /**
  * @brief holds information for Data directories in a PE file format
  *  such as Import table, export table, IAT table...etc.
  */
 class DataDirectory {
  public:
-  DataDirectory() {}
-  ~DataDirectory() {}
+  DataDirectory() =default;
+  ~DataDirectory()=default;
 
   void setOffset(uint32_t);
   void setVirtualAddress(uint32_t);
@@ -41,14 +42,15 @@ class DataDirectory {
   uint32_t numberOfRva_u32;
 };
 
+ 
 /**
  * @brief holds information for PE sections in a PE file format
  *  such as .text, .data, .rdata and so on.
  */
 class PESection {
  public:
-  PESection() {}
-  ~PESection() {}
+  PESection() =default;
+  ~PESection() =default;
 
   void setName(std::ifstream& in) {
     for (int idx = 0; idx < 8; idx++)
@@ -88,6 +90,7 @@ class PESection {
   uint32_t numberOfSections_u32;
 };
 
+ 
 /**
  * @brief Holds information for imported DLLs by PE file.
  */
@@ -104,6 +107,7 @@ class ImportDirectory {
   uint32_t importAddressRVA_u32;
 };
 
+ 
 /**
  * @brief Holds information for exported DLL functions.
  */
@@ -133,6 +137,7 @@ class ExportDirectory {
   // std::vector<exportAddressName> exportAddress;
 };
 
+ 
 /**
  * @brief holds information for PE file format, carries out PE-format specific
  * operations, loading, reading displaying header info.
@@ -193,7 +198,9 @@ class PE {
   uint64_t e_res_u64;       // Reserved uint16_ts (4 uint16_ts)
   uint16_t e_oemid_u16;     // OEM identifier (for e_oeminfo)
   uint16_t e_oeminfo_u16;   // OEM information; e_oemid specific
-  uint64_t e_res2_u64;      // Reserved uint16_ts (10 uint16_ts)
+  uint64_t e_res2_1_u64;    // Reserved uint16_ts (20 bytes)
+  uint64_t e_res2_2_u64;
+  uint64_t e_res2_3_u64;
   uint32_t e_lfanew_u32;    // Offset to start of PE header
 
   // PE header

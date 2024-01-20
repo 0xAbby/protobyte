@@ -20,8 +20,8 @@
 class ELFTest : public testing::Test {
  public:
   ELF elf;
-  ELFTest() { elf.init("samples/elf/lshw"); }
-  ~ELFTest() {}
+  ELFTest() { elf.init("../samples/elf/lshw"); }
+  ~ELFTest() =default;
 };
 
 /**

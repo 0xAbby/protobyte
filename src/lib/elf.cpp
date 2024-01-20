@@ -9,8 +9,8 @@
 
 #include "../headers.h"
 
-ELF::ELF() {}
-ELF::~ELF() {}
+ELF::ELF() = default;
+ELF::~ELF()= default;
 
 /**
  * @brief ELF class constructor to pass filename to init() for parsing.
@@ -56,124 +56,124 @@ void ELF::init(std::string filename) {
  */
 void ELF::mapFlags() {
   using namespace std;
-  etypeFlags.insert(pair<uint16_t, string>(0, "NONE"));
-  etypeFlags.insert(pair<uint16_t, string>(1, "ET_REL"));
-  etypeFlags.insert(pair<uint16_t, string>(2, "ET_EXEC"));
-  etypeFlags.insert(pair<uint16_t, string>(3, "Dynamic / Position Independant ET_DYN"));
-  etypeFlags.insert(pair<uint16_t, string>(4, "ET_CORE"));
-  etypeFlags.insert(pair<uint16_t, string>(5, "ET_LOOS"));
+  etypeFlags.try_emplace(0, "NONE");
+  etypeFlags.try_emplace(1, "ET_REL");
+  etypeFlags.try_emplace(2, "ET_EXEC");
+  etypeFlags.try_emplace(3, "Dynamic / Position Independant ET_DYN");
+  etypeFlags.try_emplace(4, "ET_CORE");
+  etypeFlags.try_emplace(5, "ET_LOOS");
 
 
-  emachineFlags.insert(pair<uint16_t, string>(40, "ARM (EM_ARM)"));
-  emachineFlags.insert(pair<uint16_t, string>(41, "EM_ALPHA"));
-  emachineFlags.insert(pair<uint16_t, string>(50, "EM_IA_64"));
-  emachineFlags.insert(pair<uint16_t, string>(51, "EM_MIPS_X"));
-  emachineFlags.insert(pair<uint16_t, string>(62, "64bit (EM_X86_64)"));
-  emachineFlags.insert(pair<uint16_t, string>(3, "Intel 386 (EM_386)"));
-  emachineFlags.insert(pair<uint16_t, string>(8, "MIPS (EM_MIPS)"));
-  emachineFlags.insert(pair<uint16_t, string>(10, "EM_MIPS_RS3_LE"));
+  emachineFlags.try_emplace(40, "ARM (EM_ARM)");
+  emachineFlags.try_emplace(41, "EM_ALPHA");
+  emachineFlags.try_emplace(50, "EM_IA_64");
+  emachineFlags.try_emplace(51, "EM_MIPS_X");
+  emachineFlags.try_emplace(62, "64bit (EM_X86_64)");
+  emachineFlags.try_emplace(3, "Intel 386 (EM_386)");
+  emachineFlags.try_emplace(8, "MIPS (EM_MIPS)");
+  emachineFlags.try_emplace(10, "EM_MIPS_RS3_LE");
 
-  eclassFlags.insert(pair<uint16_t, string>(1, "32bit (ELFCLASS32)"));
-  eclassFlags.insert(pair<uint16_t, string>(2, "64bit (ELFCLASS64)"));
+  eclassFlags.try_emplace(1, "32bit (ELFCLASS32)");
+  eclassFlags.try_emplace(2, "64bit (ELFCLASS64)");
 
-  edataFlags.insert(pair<uint16_t, string>(1, "Least Significant Byte (LSB)"));
-  edataFlags.insert(pair<uint16_t, string>(2, "Most Significant Byte (MSB)"));
+  edataFlags.try_emplace(1, "Least Significant Byte (LSB)");
+  edataFlags.try_emplace(2, "Most Significant Byte (MSB)");
 
-  eiosabiFlags.insert(pair<uint16_t, string>(0, "NONE"));
-  eiosabiFlags.insert(pair<uint16_t, string>(1, "HPUX"));
-  eiosabiFlags.insert(pair<uint16_t, string>(2, "NETBSD"));
-  eiosabiFlags.insert(pair<uint16_t, string>(3, "Linux"));
-  eiosabiFlags.insert(pair<uint16_t, string>(6, "SOLARIS"));
-  eiosabiFlags.insert(pair<uint16_t, string>(7, "AIX"));
-  eiosabiFlags.insert(pair<uint16_t, string>(8, "IRIX"));
-  eiosabiFlags.insert(pair<uint16_t, string>(9, "FREEBSD"));
-  eiosabiFlags.insert(pair<uint16_t, string>(10, "TRU64"));
-  eiosabiFlags.insert(pair<uint16_t, string>(12, "OPENBSD"));
-  eiosabiFlags.insert(pair<uint16_t, string>(64, "ARM_AEABI"));
-  eiosabiFlags.insert(pair<uint16_t, string>(97, "ARM"));
+  eiosabiFlags.try_emplace(0, "NONE");
+  eiosabiFlags.try_emplace(1, "HPUX");
+  eiosabiFlags.try_emplace(2, "NETBSD");
+  eiosabiFlags.try_emplace(3, "Linux");
+  eiosabiFlags.try_emplace(6, "SOLARIS");
+  eiosabiFlags.try_emplace(7, "AIX");
+  eiosabiFlags.try_emplace(8, "IRIX");
+  eiosabiFlags.try_emplace(9, "FREEBSD");
+  eiosabiFlags.try_emplace(10, "TRU64");
+  eiosabiFlags.try_emplace(12, "OPENBSD");
+  eiosabiFlags.try_emplace(64, "ARM_AEABI");
+  eiosabiFlags.try_emplace(97, "ARM");
   
-  programHeaderType_m.insert(pair<uint32_t, string>(0, "PT_NULL"));
-  programHeaderType_m.insert(pair<uint32_t, string>(1, "PT_LOAD"));
-  programHeaderType_m.insert(pair<uint32_t, string>(2, "PT_DYNAMIC"));
-  programHeaderType_m.insert(pair<uint32_t, string>(3, "PT_INTERP"));
-  programHeaderType_m.insert(pair<uint32_t, string>(4, "PT_NOTE"));
-  programHeaderType_m.insert(pair<uint32_t, string>(5, "PT_SHLIB"));
-  programHeaderType_m.insert(pair<uint32_t, string>(6, "PT_PHDR"));
-  programHeaderType_m.insert(pair<uint32_t, string>(7, "PT_TLS"));
-  programHeaderType_m.insert(pair<uint32_t, string>(8, "PT_NUM"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x60000000, "PT_LOOS"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x6474e550, "PT_GNU_EH_FRAME"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x6474e551, "PT_GNU_STACK"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x6474e552, "PT_GNU_RELRO"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x6474e553, "PT_GNU_PROPERTY"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x6ffffffa, "PT_LOSUNW"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x6ffffffa, "PT_SUNWBSS"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x6ffffffb, "PT_SUNWSTACK"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x6fffffff, "PT_HISUNW"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x6fffffff, "PT_HIOS"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x70000000, "PT_LOPROC"));
-  programHeaderType_m.insert(pair<uint32_t, string>(0x7fffffff, "PT_HIPROC"));
+  programHeaderType_m.try_emplace(0, "PT_NULL");
+  programHeaderType_m.try_emplace(1, "PT_LOAD");
+  programHeaderType_m.try_emplace(2, "PT_DYNAMIC");
+  programHeaderType_m.try_emplace(3, "PT_INTERP");
+  programHeaderType_m.try_emplace(4, "PT_NOTE");
+  programHeaderType_m.try_emplace(5, "PT_SHLIB");
+  programHeaderType_m.try_emplace(6, "PT_PHDR");
+  programHeaderType_m.try_emplace(7, "PT_TLS");
+  programHeaderType_m.try_emplace(8, "PT_NUM");
+  programHeaderType_m.try_emplace(0x60000000, "PT_LOOS");
+  programHeaderType_m.try_emplace(0x6474e550, "PT_GNU_EH_FRAME");
+  programHeaderType_m.try_emplace(0x6474e551, "PT_GNU_STACK");
+  programHeaderType_m.try_emplace(0x6474e552, "PT_GNU_RELRO");
+  programHeaderType_m.try_emplace(0x6474e553, "PT_GNU_PROPERTY");
+  programHeaderType_m.try_emplace(0x6ffffffa, "PT_LOSUNW");
+  programHeaderType_m.try_emplace(0x6ffffffa, "PT_SUNWBSS");
+  programHeaderType_m.try_emplace(0x6ffffffb, "PT_SUNWSTACK");
+  programHeaderType_m.try_emplace(0x6fffffff, "PT_HISUNW");
+  programHeaderType_m.try_emplace(0x6fffffff, "PT_HIOS");
+  programHeaderType_m.try_emplace(0x70000000, "PT_LOPROC");
+  programHeaderType_m.try_emplace(0x7fffffff, "PT_HIPROC");
   
-  programHeaderFlag_m.insert(pair<uint32_t, std::string>(0, "None"));
-  programHeaderFlag_m.insert(pair<uint32_t, std::string>(1, "Execute (PF_X)"));
-  programHeaderFlag_m.insert(pair<uint32_t, std::string>(2, "Write (PF_W)"));
-  programHeaderFlag_m.insert(pair<uint32_t, std::string>(3, "Write/Execute (PF_WX)"));
-  programHeaderFlag_m.insert(pair<uint32_t, std::string>(4, "Read (PF_R)"));
-  programHeaderFlag_m.insert(pair<uint32_t, std::string>(5, "Read/Execute (PF_RX)"));
-  programHeaderFlag_m.insert(pair<uint32_t, std::string>(6, "Read/Write (PF_RW)"));
-  programHeaderFlag_m.insert(pair<uint32_t, std::string>(7, "Read/Write/Execute (PF_RWX)"));
-  programHeaderFlag_m.insert(pair<uint32_t, std::string>(0x0ff00000, "PF_MASKOS"));
-  programHeaderFlag_m.insert(pair<uint32_t, std::string>(0xf0000000, "PF_MASKPROC"));
+  programHeaderFlag_m.try_emplace(0, "None");
+  programHeaderFlag_m.try_emplace(1, "Execute (PF_X)");
+  programHeaderFlag_m.try_emplace(2, "Write (PF_W)");
+  programHeaderFlag_m.try_emplace(3, "Write/Execute (PF_WX)");
+  programHeaderFlag_m.try_emplace(4, "Read (PF_R)");
+  programHeaderFlag_m.try_emplace(5, "Read/Execute (PF_RX)");
+  programHeaderFlag_m.try_emplace(6, "Read/Write (PF_RW)");
+  programHeaderFlag_m.try_emplace(7, "Read/Write/Execute (PF_RWX)");
+  programHeaderFlag_m.try_emplace(0x0ff00000, "PF_MASKOS");
+  programHeaderFlag_m.try_emplace(0xf0000000, "PF_MASKPROC");
 
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0, "SHT_NULL"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(1, "SHT_PROGBITS"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(2, "SHT_SYMTAB"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(3, "SHT_STRTAB"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(4, "SHT_RELA"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(5, "SHT_HASH"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(6, "SHT_DYNAMIC"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(7, "SHT_NOTE"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(8, "SHT_NOBITS"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(9, "SHT_REL"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(10, "SHT_SHLIB"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(11, "SHT_DYNSYM"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(14, "SHT_INIT_ARRAY"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(15, "SHT_FINI_ARRAY"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(16, "SHT_PREINIT_ARRAY"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(17, "SHT_GROUP"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(18, "SHT_SYMTAB_SHNDX"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(19, "SHT_NUM"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x60000000, "SHT_LOOS"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6ffffff5, "SHT_GNU_ATTRIBUTES"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6ffffff6, "SHT_GNU_HASH"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6ffffff7, "SHT_GNU_LIBLIST"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6ffffff8, "SHT_CHECKSUM"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6ffffffa, "SHT_LOSUNW"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6ffffffa, "SHT_SUNW_move"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6ffffffb, "SHT_SUNW_COMDAT"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6ffffffc, "SHT_SUNW_syminfo"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6ffffffd, "SHT_GNU_verdef"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6ffffffe, "SHT_GNU_verneed"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6fffffff, "SHT_GNU_versym"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6fffffff, "SHT_HISUNW"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x6fffffff, "SHT_HIOS"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x70000000, "SHT_LOPROC"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x7fffffff, "SHT_HIPROC"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x80000000, "SHT_LOUSER"));
-  sectionHeaderType_m.insert(pair<uint32_t, string>(0x8fffffff, "SHT_HIUSER"));  
+  sectionHeaderType_m.try_emplace(0, "SHT_NULL");
+  sectionHeaderType_m.try_emplace(1, "SHT_PROGBITS");
+  sectionHeaderType_m.try_emplace(2, "SHT_SYMTAB");
+  sectionHeaderType_m.try_emplace(3, "SHT_STRTAB");
+  sectionHeaderType_m.try_emplace(4, "SHT_RELA");
+  sectionHeaderType_m.try_emplace(5, "SHT_HASH");
+  sectionHeaderType_m.try_emplace(6, "SHT_DYNAMIC");
+  sectionHeaderType_m.try_emplace(7, "SHT_NOTE");
+  sectionHeaderType_m.try_emplace(8, "SHT_NOBITS");
+  sectionHeaderType_m.try_emplace(9, "SHT_REL");
+  sectionHeaderType_m.try_emplace(10, "SHT_SHLIB");
+  sectionHeaderType_m.try_emplace(11, "SHT_DYNSYM");
+  sectionHeaderType_m.try_emplace(14, "SHT_INIT_ARRAY");
+  sectionHeaderType_m.try_emplace(15, "SHT_FINI_ARRAY");
+  sectionHeaderType_m.try_emplace(16, "SHT_PREINIT_ARRAY");
+  sectionHeaderType_m.try_emplace(17, "SHT_GROUP");
+  sectionHeaderType_m.try_emplace(18, "SHT_SYMTAB_SHNDX");
+  sectionHeaderType_m.try_emplace(19, "SHT_NUM");
+  sectionHeaderType_m.try_emplace(0x60000000, "SHT_LOOS");
+  sectionHeaderType_m.try_emplace(0x6ffffff5, "SHT_GNU_ATTRIBUTES");
+  sectionHeaderType_m.try_emplace(0x6ffffff6, "SHT_GNU_HASH");
+  sectionHeaderType_m.try_emplace(0x6ffffff7, "SHT_GNU_LIBLIST");
+  sectionHeaderType_m.try_emplace(0x6ffffff8, "SHT_CHECKSUM");
+  sectionHeaderType_m.try_emplace(0x6ffffffa, "SHT_LOSUNW");
+  sectionHeaderType_m.try_emplace(0x6ffffffa, "SHT_SUNW_move");
+  sectionHeaderType_m.try_emplace(0x6ffffffb, "SHT_SUNW_COMDAT");
+  sectionHeaderType_m.try_emplace(0x6ffffffc, "SHT_SUNW_syminfo");
+  sectionHeaderType_m.try_emplace(0x6ffffffd, "SHT_GNU_verdef");
+  sectionHeaderType_m.try_emplace(0x6ffffffe, "SHT_GNU_verneed");
+  sectionHeaderType_m.try_emplace(0x6fffffff, "SHT_GNU_versym");
+  sectionHeaderType_m.try_emplace(0x6fffffff, "SHT_HISUNW");
+  sectionHeaderType_m.try_emplace(0x6fffffff, "SHT_HIOS");
+  sectionHeaderType_m.try_emplace(0x70000000, "SHT_LOPROC");
+  sectionHeaderType_m.try_emplace(0x7fffffff, "SHT_HIPROC");
+  sectionHeaderType_m.try_emplace(0x80000000, "SHT_LOUSER");
+  sectionHeaderType_m.try_emplace(0x8fffffff, "SHT_HIUSER");
 
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0, "UNDEF"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xff00, "LORESERVE"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xff00, "LOPROC"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xff00, "BEFORE"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xff01, "AFTER"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xff1f, "HIPROC"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xff20, "LOOS"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xff3f, "HIOS"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xfff1, "ABS"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xfff2, "COMMON"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xffff, "XINDEX"));
-  sectionHeaderFlag_m.insert(pair<uint32_t, string>(0xffff, "HIRESERVE"));
+  sectionHeaderFlag_m.try_emplace(0, "UNDEF");
+  sectionHeaderFlag_m.try_emplace(0xff00, "LORESERVE");
+  sectionHeaderFlag_m.try_emplace(0xff00, "LOPROC");
+  sectionHeaderFlag_m.try_emplace(0xff00, "BEFORE");
+  sectionHeaderFlag_m.try_emplace(0xff01, "AFTER");
+  sectionHeaderFlag_m.try_emplace(0xff1f, "HIPROC");
+  sectionHeaderFlag_m.try_emplace(0xff20, "LOOS");
+  sectionHeaderFlag_m.try_emplace(0xff3f, "HIOS");
+  sectionHeaderFlag_m.try_emplace(0xfff1, "ABS");
+  sectionHeaderFlag_m.try_emplace(0xfff2, "COMMON");
+  sectionHeaderFlag_m.try_emplace(0xffff, "XINDEX");
+  sectionHeaderFlag_m.try_emplace(0xffff, "HIRESERVE");
   
 }
 
@@ -373,9 +373,9 @@ void ELF::readE_ident(std::ifstream& file) {
   for (int idx = 0; idx < 16; idx++) {
     file.get(reinterpret_cast<char*>(bytes), 1);
     e_ident[idx] = bytes[0];
-    return;
   }
 }
+
 /**
  * @brief Returns ELF's E_ident.
  *
@@ -383,6 +383,7 @@ void ELF::readE_ident(std::ifstream& file) {
 unsigned char* ELF::getE_ident() {
   return this->e_ident;
 }
+
 /**
  * @brief Returns ELF's E_type.
  *
@@ -826,6 +827,7 @@ uint64_t ProgramHeader::getP_memsz() {
 uint64_t ProgramHeader::getP_align() {
   return this->p_align_u64;
 }
+
 /********************** section header **************************/
 void SectionHeader::setSh_name(uint32_t value) {
   this->sh_name_u32 = value;
@@ -896,7 +898,7 @@ uint32_t SectionHeader::getSh_entsize() {
  * 
  * @return None.
  */
-void SectionHeader::setSh_name(std::string name) {
+void SectionHeader::setSh_name(std::string& name) {
   this->name = name;
 }
 
