@@ -1,7 +1,7 @@
 
-![Untitled Diagram drawio(2)](https://github.com/0xAbby/binlyzer/assets/147592615/f3ce20b7-f801-4553-ae06-6e09873bb342)
+![Untitled Diagram drawio(2)](https://github.com/0xAbby/protobyte/assets/147592615/f3ce20b7-f801-4553-ae06-6e09873bb342)
 
-## binlyzer
+## protobyte
 
 A utility program for parsing header information found in executable for formats. Namely PE, ELF and Mach-O.
 
@@ -10,21 +10,21 @@ The project is on-going (still in progress), as I updated its features and expan
 ### Building and compiling
 To build the program, simply clone and use 'make':
 ```
-~ $ git clone https://github.com/0xAbby/binlyzer
-~ $ cd binlyzer/build
-~/binlyzer/build $ cmake ../
+~ $ git clone https://github.com/0xAbby/protobyte
+~ $ cd protobyte/build
+~/protobyte/build $ cmake ../
 ...
-~/binlyzer/build $ make -j
+~/protobyte/build $ make -j
 ...
 ```
 
-You will have by now two binaries to run, one is 'binlyzer' and the other is 'runTests' for basic unit testing.
+You will have by now two binaries to run, one is 'protobyte' and the other is 'runTests' for basic unit testing.
 
 ### Examples
 
 Some examples parsing PE file:
 ```
-~/binlyzer/build $ ./binlyzer samples/pe/dbghelp.dll 
+~/protobyte/build $ ./protobyte samples/pe/dbghelp.dll 
 Parsed info: 
 
 Magic bytes: 0x5a4d
@@ -51,7 +51,7 @@ Name: .data
 
 Another example parsing an ELF file:
 ```
-~/binlyzer/build $ ./binlyzer samples/elf/libstagefright_flacdec.so 
+~/protobyte/build $ ./protobyte samples/elf/libstagefright_flacdec.so 
 Magic bytes: 	0x7F454C46 | 64bit (ELFCLASS64)
 byte order: 	Least Significant Byte (LSB)
 OS ABI: 	NONE
@@ -148,7 +148,7 @@ sectionHeader[18]
 
 Example for parsing Mach-O format:
 ```
-~/binlyzer/build $ ./binlyzer samples/mach-o/apfs_boot_util
+~/protobyte/build $ ./protobyte samples/mach-o/apfs_boot_util
 Mach-O File: 
   Magic bytes: 	0xfeedfacf MACHO_64
   CPU type:    	0x100000c CPU_TYPE_ARM64
@@ -207,7 +207,7 @@ Installations steps are shown here: https://github.com/google/googletest/blob/ma
 
 If you were able to compile and build the source code, then the unit testing binary will also have been compiled in the same build directory:
 ```
-~/binlyzer/build $ ./runTests
+~/protobyte/build $ ./runTests
 
 [==========] Running 13 tests from 1 test suite.
 [----------] Global test environment set-up.
