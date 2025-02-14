@@ -2,7 +2,7 @@
  * @file elf.cpp
  * @brief  Implementations for functions that deal with ELF file format.
  *
- * @ref https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

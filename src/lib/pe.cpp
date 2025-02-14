@@ -3,7 +3,7 @@
  * @brief  Implements functions that deals with PE structures
  *        read and save information in a PE class object members.
  *
- * @ref  https://github.com/0xAbby/binlyzer
+ * @ref  https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

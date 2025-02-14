@@ -2,7 +2,7 @@
  * @file elf.h
  * @brief  Definitions and declarations for ELF module
  *
- * @ref https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

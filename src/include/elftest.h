@@ -2,7 +2,7 @@
  * @file elftest.h
  * @brief  definitions and unit tests for ELF format.
  *
- * @ref https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

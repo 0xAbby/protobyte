@@ -2,7 +2,7 @@
  * @file runTests.cpp
  * @brief  Unit tests main source code.
  *
- * @ref https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

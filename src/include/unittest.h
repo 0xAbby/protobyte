@@ -1,7 +1,7 @@
 /**
  * @file unittest.h
  *
- *  https://github.com/0xAbby/binlyzer
+ *  https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

@@ -2,7 +2,7 @@
  * @file mach_o-test.h
  * @brief  definitions and unit tests for Mach-O format.
  *
- * @ref https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

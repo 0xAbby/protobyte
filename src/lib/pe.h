@@ -3,7 +3,7 @@
  * @brief  Definitions and declarations for PE module, Dos header, PE header,
  * sections, and directories.
  *
- * @ref https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

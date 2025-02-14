@@ -2,7 +2,7 @@
  * @file file_io.cpp
  * @brief  Methods used for read/write operations on a given file
  *
- * @ref https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

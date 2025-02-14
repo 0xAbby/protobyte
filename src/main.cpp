@@ -1,8 +1,8 @@
 /**
  * @file main.cpp
- * @brief  binlyzer, a program for reading an executable's header info.
+ * @brief  protobyte, a program for reading an executable's header info.
  *
- * @ref https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

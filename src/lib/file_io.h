@@ -3,7 +3,7 @@
  * @brief  definitions for class / functions used to interact with the file,
  *      reading and writing operations.
  *
- * @ref https://github.com/0xAbby/binlyzer
+ * @ref https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

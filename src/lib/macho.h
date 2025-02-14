@@ -2,7 +2,7 @@
  * @file macho.h
  * @brief  Definitions and declarations for Mach-O module
  *
- * @ref  https://github.com/0xAbby/binlyzer
+ * @ref  https://github.com/0xAbby/protobyte
  *
  * @author Abdullah Ada
  */

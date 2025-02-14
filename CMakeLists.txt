@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 
-project(binlyzer LANGUAGES CXX)
+project(protobyte LANGUAGES CXX)
 project(runTests LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -21,7 +21,7 @@ file(GLOB BUILD_SOURCES
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) 
 
-add_executable(binlyzer "src/main.cpp" 
+add_executable(protobyte "src/main.cpp" 
                         ${BUILD_SOURCES})
 
 
