@@ -7,9 +7,9 @@
  * @author Abdullah Ada
  */
 
-#include "include/elftest.h"
-#include "include/petest.h"
-#include "include/mach_o-test.h"
+#include "elftest.h"
+#include "petest.h"
+#include "mach_o-test.h"
 
 int main(int argc, char* argv[]) {
   testing::InitGoogleTest(&argc, argv);

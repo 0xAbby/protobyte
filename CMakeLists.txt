@@ -1,17 +1,13 @@
 cmake_minimum_required(VERSION 3.17)
 
 project(protobyte LANGUAGES CXX)
-project(runTests LANGUAGES CXX)
 
+# --------- Set the C++ standard to C++20 ----------
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
 
-enable_testing()
-
-add_subdirectory(googletest)
-
-file(GLOB TEST_HEADERS
-    "src/include")
+# ------------- build stand-alone binary -----------
 
 file(GLOB BUILD_SOURCES 
     "src/lib/*.cpp"
@@ -23,11 +19,4 @@ add_executable(protobyte "src/main.cpp"
                         ${BUILD_SOURCES})
 
 
-add_executable(runTests "src/runTests.cpp"
-                        ${BUILD_SOURCES} 
-                        ${TEST_HEADERS})
-
-target_link_libraries(runTests gtest gtest_main)
-target_include_directories(runTests PRIVATE googletest/include)
-
-#target_link_libraries(runTests GTest::GTest GTest::Main)
+# --------------------------------------------------

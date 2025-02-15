@@ -11,23 +11,24 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Install gtest manually
-      run: sudo apt-get install libgtest-dev && cd /usr/src/gtest && sudo cmake CMakeLists.txt && sudo make && sudo cp lib/*.a /usr/lib && sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a && sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
-    - uses: actions/checkout@v1
     
-    - name: Set up GCC
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: latest
-        platform: x64
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
 
-    - name: Run Python unit tests
-      run: bash ./setup.sh
+    - name: Install Clang
+      run: sudo apt-get install -y clang
 
-    - name: run unittest
-      working-directory: ./build/
+    - name: Install CMake
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake
+        
+    - name: Build code
+      run: |
+        bash ./build.sh default
+        bash ./build.sh unit_tests
+
+    - name: run unit tests
+      working-directory: ./src/unit-tests/build
       run: ./runTests

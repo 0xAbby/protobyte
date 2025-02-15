@@ -7,7 +7,7 @@
  * @author Abdullah Ada
  */
 #ifndef ELFTEST_H
-#define ELSTEST_H
+#define ELFTEST_H
 
 #include <iostream>
 #include <gtest/gtest.h>
