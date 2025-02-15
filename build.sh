@@ -8,7 +8,8 @@ export CC=/usr/bin/clang
 binary_build() {
     cd build
     cmake ../
-    make -j    
+    make -j
+    cd ..    
 }
 
 unit_tests_cov_build() {
@@ -17,6 +18,7 @@ unit_tests_cov_build() {
     cd src/unit-tests/build
     cmake ../
     make -j
+    cd ../../../
 }
 
 if [ "$1" == "default" ]; then
