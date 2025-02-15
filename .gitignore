@@ -1,4 +1,6 @@
-unit_test/
 protobyte
-build/
+build/Makefile
+build/cmake_install.cmake
+build/CMakeFiles
+build/CMakeCache.txt
 .vscode

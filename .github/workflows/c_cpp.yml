@@ -28,5 +28,5 @@ jobs:
       run: bash ./build.sh default && bash ./build.sh unit_tests
 
     - name: run unit tests
-      working-directory: ./src/unit-tests/build
+      working-directory: src/unit-tests/build
       run: ./runTests
