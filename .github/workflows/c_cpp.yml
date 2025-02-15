@@ -25,9 +25,7 @@ jobs:
         sudo apt-get install -y cmake
         
     - name: Build code
-      run: |
-        bash ./build.sh default
-        bash ./build.sh unit_tests
+      run: bash ./build.sh default && bash ./build.sh unit_tests
 
     - name: run unit tests
       working-directory: ./src/unit-tests/build
