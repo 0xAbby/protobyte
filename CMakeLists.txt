@@ -7,10 +7,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 enable_testing()
-find_package(GTest REQUIRED)
 
-include_directories(gtest/include)
-file(GLOB_RECURSE google_test_headers /usr/include/gtest/*.h)
+add_subdirectory(googletest)
 
 file(GLOB TEST_HEADERS
     "src/include")
@@ -29,4 +27,7 @@ add_executable(runTests "src/runTests.cpp"
                         ${BUILD_SOURCES} 
                         ${TEST_HEADERS})
 
-target_link_libraries(runTests GTest::GTest GTest::Main)
+target_link_libraries(runTests gtest gtest_main)
+target_include_directories(runTests PRIVATE googletest/include)
+
+#target_link_libraries(runTests GTest::GTest GTest::Main)
