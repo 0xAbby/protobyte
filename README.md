@@ -1,6 +1,10 @@
 
 ![protobyte_microscope_icon](https://github.com/user-attachments/assets/8ac740fe-d577-456e-9ac4-3eb277b08802)
 
+
+[![build](https://github.com/0xAbby/protobyte/actions/workflows/c_cpp.yml/badge.svg)](https://github.com/0xAbby/protobyte/actions/workflows/c_cpp.yml)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+
 ## protobyte
 
 A utility program for parsing header information found in executable for formats. Namely PE, ELF and Mach-O.
