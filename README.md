@@ -4,7 +4,7 @@
 
 [![build](https://github.com/0xAbby/protobyte/actions/workflows/c_cpp.yml/badge.svg)](https://github.com/0xAbby/protobyte/actions/workflows/c_cpp.yml)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Coverage Status](https://coveralls.io/repos/github/0xAbby/protobyte/badge.svg)](https://coveralls.io/github/0xAbby/protobyte)
+[![Coverage Status](https://coveralls.io/repos/github/0xAbby/protobyte/badge.png)](https://coveralls.io/github/0xAbby/protobyte)
 
 ## protobyte
 
