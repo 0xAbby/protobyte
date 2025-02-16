@@ -7,6 +7,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 # --------------build unit tests and coverage ------
+
+# disable not needed gtest options 
+set(BUILD_GMOCK OFF)
+set(BUILD_DOCS OFF)
+set(BUILD_GTEST_TESTS OFF)
+set(BUILD_GTEST_EXAMPLES OFF)
+
 file(GLOB BUILD_SOURCES 
     "../lib/*.cpp"
     "../lib/*.h")
@@ -25,7 +32,8 @@ file(MAKE_DIRECTORY ${COVERAGE_DIRECTORY})
 # Enable coverage flags 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
 set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-dir=./cov/")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-dir=./cov/")
+
 
 # Add the directory for googletest
 add_subdirectory(googletest)
@@ -33,7 +41,7 @@ add_executable(runTests "runTests.cpp"
                         ${BUILD_SOURCES} 
                         ${TEST_HEADERS})
 
-target_link_libraries(runTests gtest gtest_main)
+target_link_libraries(runTests gtest)
 target_include_directories(runTests PRIVATE googletest/include)
 
 # --------------------------------------------------

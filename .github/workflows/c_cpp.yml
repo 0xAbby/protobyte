@@ -23,10 +23,23 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake
-        
+
+    - name: Install lcov
+      run: sudo apt-get install -y lcov
+
     - name: Build code
       run: bash ./build.sh default && bash ./build.sh unit_tests
 
     - name: run unit tests
       working-directory: src/unit-tests/build
       run: ./runTests
+
+    - name: Generate coverage report
+      working-directory: src/unit-tests/build
+      run: lcov --capture --directory . --output-file coverage.info
+
+    - name: Upload coverage report as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-report
+        path: coverage.info  
