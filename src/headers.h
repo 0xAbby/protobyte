@@ -24,5 +24,7 @@
 #include "lib/pe.h"
 #include "lib/elf.h"
 #include "lib/macho.h"
+#include "lib/md5.h"
+#include "lib/sha1.h"
 
 #endif

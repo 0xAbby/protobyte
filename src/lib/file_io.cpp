@@ -21,6 +21,17 @@ FileIO::~FileIO() {}
  * @return none.
  */
 FileIO::FileIO(std::string filename) {
+  MD5Hasher md5;
+  SHA1     sha1;
+
+  // Calculate MD5 / SHA1 hashes
+  md5.MD5FileContent(filename, md5_hash);
+  sha1_hash = sha1.from_file(filename);
+
+  std::cout << "Reading " << filename << std::endl;
+  std::cout << "  MD5:  " << md5_hash.c_str() << std::endl;
+  std::cout << "  SHA1: " << sha1_hash.c_str() << std::endl;
+
   uint32_t bytes = getMagicBytes(filename);
 
   if (uint16_t(bytes) == PE_FILE) {

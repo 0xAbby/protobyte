@@ -294,7 +294,7 @@ inline std::string SHA1::final() {
   return result.str();
 }
 
-inline std::string SHA1::from_file(const std::string& filename) {
+std::string SHA1::from_file(const std::string& filename) {
   std::ifstream stream(filename.c_str(), std::ios::binary);
   SHA1 checksum;
   checksum.update(stream);

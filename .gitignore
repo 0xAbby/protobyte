@@ -3,4 +3,8 @@ build/Makefile
 build/cmake_install.cmake
 build/CMakeFiles
 build/CMakeCache.txt
+src/unit-tests/build/Makefile
+src/unit-tests/build/cmake_install.cmake
+src/unit-tests/build/CMakeFiles
+src/unit-tests/build/CMakeCache.txt
 .vscode

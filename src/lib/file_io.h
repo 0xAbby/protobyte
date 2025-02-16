@@ -47,6 +47,10 @@ class FileIO {
   static uint16_t read_u16(std::ifstream&, bool);
   static uint32_t read_u32(std::ifstream&, bool);
   static uint64_t read_u64(std::ifstream&, bool);
+
+  private:
+    std::string md5_hash;
+    std::string sha1_hash;
 };
 
 #endif
