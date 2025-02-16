@@ -34,12 +34,16 @@ jobs:
       working-directory: src/unit-tests/build
       run: ./runTests
 
-    - name: Generate coverage report
+    - name: Run tests and collect coverage data
       working-directory: src/unit-tests/build
-      run: lcov --capture --directory . --output-file coverage.info
+      run: |
+        lcov --capture --directory . --output-file coverage.info
+        lcov --remove coverage.info '*/test/*' '*/third_party/*' --output-file coverage.info
+        lcov --list coverage.info
 
-    - name: Upload coverage report as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report
-        path: coverage.info  
+    - name: Upload coverage to Coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+      run: |
+        pip install --user cpp-coveralls
+        coveralls

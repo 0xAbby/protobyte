@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 
+project(runTests LANGUAGES CXX)
 # --------- Set the C++ standard to C++20 ----------
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -18,11 +19,6 @@ file(GLOB BUILD_SOURCES
     "../lib/*.cpp"
     "../lib/*.h")
 
-
-project(runTests LANGUAGES CXX)
-#file(GLOB TEST_HEADERS
-#    "src/include")
-
 enable_testing()
 
 # local directory to save coverage data
@@ -32,7 +28,6 @@ file(MAKE_DIRECTORY ${COVERAGE_DIRECTORY})
 # Enable coverage flags 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
 set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-dir=./cov/")
 
 
 # Add the directory for googletest

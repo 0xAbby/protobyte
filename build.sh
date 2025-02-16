@@ -1,8 +1,8 @@
 #!/bin/bash
 # a script to fetch submodule and build everything
 
-export CXX=/usr/bin/clang++
-export CC=/usr/bin/clang
+#export CXX=/usr/bin/clang++
+#export CC=/usr/bin/clang
 
 
 binary_build() {
