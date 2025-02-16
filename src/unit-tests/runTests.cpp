@@ -11,6 +11,7 @@
 #include "petest.h"
 #include "mach_o-test.h"
 #include "hashtest.h"
+#include "fileio_test.h"
 
 int main(int argc, char* argv[]) {
   testing::InitGoogleTest(&argc, argv);
