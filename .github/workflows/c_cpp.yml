@@ -26,6 +26,7 @@ jobs:
         cd src/unit-tests/build
         ./runTests
         lcov --capture --directory . --output-file coverage.info
-        lcov --remove coverage.info '/usr/include/c++/*' --output-file filtered-coverage.info
+        lcov --remove coverage.info '/usr/include/c++/*' --output-file filtered-coverage1.info
+        lcov --remove filtered-coverage1.info '/googletest/include/gtest/*' --output-file coverage-final.info
         curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C ./
-        ./coveralls report filtered-coverage.info -r ${{ secrets.COVERALLS_REPO_TOKEN }}
+        ./coveralls report coverage-final.info -r ${{ secrets.COVERALLS_REPO_TOKEN }}
