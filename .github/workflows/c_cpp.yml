@@ -27,7 +27,7 @@ jobs:
       working-directory: src/unit-tests/build
       run: |
         ./runTests
-        lcov --rc no_exception_branch=1 --rc geninfo_unexecuted_blocks=1 --capture --directory . --output-file coverage.info
+        lcov --rc no_exception_branch=1 --rc geninfo_unexecuted_blocks=1 --ignore-errors --capture --directory . --output-file coverage.info
 
     - name: Upload coverage report as an artifact 
       uses: actions/upload-artifact@v4
