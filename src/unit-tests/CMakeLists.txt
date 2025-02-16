@@ -22,8 +22,8 @@ file(GLOB BUILD_SOURCES
 enable_testing()
 
 # local directory to save coverage data
-set(COVERAGE_DIRECTORY "${CMAKE_BINARY_DIR}/cov")
-file(MAKE_DIRECTORY ${COVERAGE_DIRECTORY})
+#set(COVERAGE_DIRECTORY "${CMAKE_BINARY_DIR}/cov")
+#file(MAKE_DIRECTORY ${COVERAGE_DIRECTORY})
 
 # Enable coverage flags 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")

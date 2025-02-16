@@ -7,31 +7,25 @@ on:
     branches: [ main ]
 
 jobs:
-
   build:
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Install cmake, lcov and coveralls
+    - name: Install cmake, lcov
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake lcov
-        sudo gem install coveralls-lcov
 
     - name: Build code and unit tests
       run: bash ./build.sh all
 
     - name: Run unit tests / Gather coverage data
-      working-directory: src/unit-tests/build
       run: |
+        cd src/unit-tests/build
         ./runTests
-        lcov --capture --directory . --output-file coverage.info --no-external
-
-    - name: Upload coverage to Coveralls
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-      run: |
-        coveralls-lcov src/unit-tests/build/coverage.info
-
+        lcov --capture --directory . --output-file coverage.info
+        lcov --remove coverage.info '/usr/include/c++/*' --output-file filtered-coverage.info
+        curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C ./
+        ./coveralls report filtered-coverage.info -r ${{ secrets.COVERALLS_REPO_TOKEN }}
