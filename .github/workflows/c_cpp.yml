@@ -20,17 +20,18 @@ jobs:
         sudo apt-get install -y cmake lcov
         pip install --user cpp-coveralls
 
-    - name: Build code
-      run: bash ./build.sh default && bash ./build.sh unit_tests
+    - name: Build code and unit tests
+      run: bash ./build.sh all
 
-    - name: run unit tests
+    - name: Run unit tests / Gather coverage data
       working-directory: src/unit-tests/build
-      run: ./runTests
-
-    - name: Gather tests coverage data
-      working-directory: src/unit-tests/build
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       run: |
+        ./runTests
         lcov --capture --directory . --output-file coverage.info
-        coveralls
+
+    - name: Upload coverage report as an artifact
+      uses: actions/upload-artifact@v3
+      working-directory: src/unit-tests/build      
+      with:
+        name: coverage-report
+        path: coverage.info
