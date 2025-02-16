@@ -20,6 +20,10 @@ jobs:
         sudo apt-get install -y cmake lcov
         pip install --user cpp-coveralls
 
+    - name: Install Coveralls uploader
+      run: |
+        gem install coveralls-lcov
+
     - name: Build code and unit tests
       run: bash ./build.sh all
 
@@ -29,8 +33,9 @@ jobs:
         ./runTests
         lcov --capture --directory . --output-file coverage.info --no-external
 
-    - name: Upload coverage report as an artifact 
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report
-        path: src/unit-tests/build/coverage.info
+    - name: Upload coverage to Coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+      run: |
+        coveralls-lcov src/unit-tests/build/coverage.info
+
