@@ -10,6 +10,7 @@
 #include "elftest.h"
 #include "petest.h"
 #include "mach_o-test.h"
+#include "hashtest.h"
 
 int main(int argc, char* argv[]) {
   testing::InitGoogleTest(&argc, argv);
