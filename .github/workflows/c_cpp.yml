@@ -14,15 +14,11 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Install cmake, lcov
+    - name: Install cmake, lcov and coveralls
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake lcov
-        pip install --user cpp-coveralls
-
-    - name: Install Coveralls uploader
-      run: |
-        gem install coveralls-lcov
+        sudo gem install coveralls-lcov
 
     - name: Build code and unit tests
       run: bash ./build.sh all
