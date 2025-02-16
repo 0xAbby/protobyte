@@ -29,9 +29,8 @@ jobs:
         ./runTests
         lcov --capture --directory . --output-file coverage.info
 
-    - name: Upload coverage report as an artifact
+    - name: Upload coverage report as an artifact 
       uses: actions/upload-artifact@v3
-      working-directory: src/unit-tests/build      
       with:
         name: coverage-report
         path: coverage.info
