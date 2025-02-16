@@ -1,5 +1,5 @@
 
-![Untitled Diagram drawio(2)](https://github.com/0xAbby/protobyte/assets/147592615/f3ce20b7-f801-4553-ae06-6e09873bb342)
+![protobyte](https://github.com/user-attachments/assets/e6e8045c-f84a-4663-b5fa-98d2feabf406)
 
 ## protobyte
 
