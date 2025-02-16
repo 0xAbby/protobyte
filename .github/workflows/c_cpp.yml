@@ -9,23 +9,16 @@ on:
 jobs:
 
   build:
-
     runs-on: ubuntu-latest
-    
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Install Clang
-      run: sudo apt-get install -y clang-14
-
-    - name: Install CMake
+    - name: Install cmake, lcov
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake
-
-    - name: Install lcov
-      run: sudo apt-get install -y lcov
+        sudo apt-get install -y cmake lcov
+        pip install --user cpp-coveralls
 
     - name: Build code
       run: bash ./build.sh default && bash ./build.sh unit_tests
@@ -34,16 +27,12 @@ jobs:
       working-directory: src/unit-tests/build
       run: ./runTests
 
-    - name: Run tests and collect coverage data
+    - name: Gather tests coverage data
       working-directory: src/unit-tests/build
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
       run: |
         lcov --capture --directory . --output-file coverage.info
         lcov --remove coverage.info '*/test/*' '*/third_party/*' --output-file coverage.info
         lcov --list coverage.info
-
-    - name: Upload coverage to Coveralls
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-      run: |
-        pip install --user cpp-coveralls
         coveralls
