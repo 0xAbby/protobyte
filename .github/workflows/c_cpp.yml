@@ -9,7 +9,7 @@ on:
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
       working-directory: src/unit-tests/build
       run: |
         ./runTests
-        lcov --rc no_exception_branch=1 --rc geninfo_unexecuted_blocks=1 --ignore-errors --capture --directory . --output-file coverage.info
+        lcov --capture --directory . --output-file coverage.info --no-external
 
     - name: Upload coverage report as an artifact 
       uses: actions/upload-artifact@v4
