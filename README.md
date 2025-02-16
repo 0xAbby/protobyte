@@ -1,5 +1,5 @@
 
-![protobyte](https://github.com/user-attachments/assets/e6e8045c-f84a-4663-b5fa-98d2feabf406)
+![protobyte_microscope_icon](https://github.com/user-attachments/assets/8ac740fe-d577-456e-9ac4-3eb277b08802)
 
 ## protobyte
 
